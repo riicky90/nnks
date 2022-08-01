@@ -1,0 +1,87 @@
+{% include 'head.html.twig' %}
+
+<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 dark:bg-gray-900">
+    {% include '/frontend/theme/header.html.twig' %}
+
+    <main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <div class="my-10 bg-white p-5 rounded-md shadow-md">
+                <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
+                    Transacties
+                </h3>
+
+                <table class="table-fixed min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th scope="col" class="p-4">
+                            <div class="flex items-center">
+                                <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
+                                       class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
+                                <label for="checkbox-all" class="sr-only">checkbox</label>
+                            </div>
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Order nummer
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Status
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Team
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Wetstrijd
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Betaald door
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Bedrag
+                        </th>
+                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                            Transactie datum
+                        </th>
+                        <th scope="col" class="p-4">
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    {% for order in orders %}
+                        <tr class="hover:bg-gray-100">
+                            <td class="p-4 w-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox" aria-describedby="checkbox-1" type="checkbox"
+                                           class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
+                                    <label for="checkbox" class="sr-only">checkbox</label>
+                                </div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                                <div class="text-base font-semibold text-gray-900">{{ order.orderNumber }}</div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ order.orderStatus }}</td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ order.registration.team.name }}</td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ order.registration.contest.name }}</td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ order.completedBy }}</td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">€ {{ order.amount|default('0,00') }}</td>
+                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ order.createdAt|date('d-m-Y H:i:s') }}</td>
+                            <td class="p-4 whitespace-nowrap space-x-2">
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if orders is empty %}
+                <!-- warning h3 tailwind -->
+                <div class="mt-4 items-center justify-center h-full">
+                    <h3 class="text-red-500 text-center text-xl">
+                        Er zijn geen transacties gevonden.
+                    </h3>
+                    {%  endif %}
+            </div>
+        </div>
+    </main>
+</div>
+</div>
+
+</body>

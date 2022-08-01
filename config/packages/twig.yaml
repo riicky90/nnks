@@ -1,0 +1,11 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    form_themes: [
+            '/theme/forms/tailwind_layout.html.twig'
+    ]
+    globals:
+        kernelProjectDir: '%kernel.project_dir%'
+
+when@test:
+    twig:
+        strict_variables: true

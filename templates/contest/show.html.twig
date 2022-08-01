@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contest{% endblock %}
+
+{% block body %}
+    <h1>Contest</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ contest.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ contest.Name }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ contest.Date ? contest.Date|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ contest.Location }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('contest_index') }}">back to list</a>
+
+    <a href="{{ path('contest_edit', {'id': contest.id}) }}">edit</a>
+
+    {{ include('contest/_delete_form.html.twig') }}
+{% endblock %}

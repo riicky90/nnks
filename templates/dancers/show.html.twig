@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dancers{% endblock %}
+
+{% block body %}
+    <h1>Dancers</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ dancer.id }}</td>
+            </tr>
+            <tr>
+                <th>FirstName</th>
+                <td>{{ dancer.FirstName }}</td>
+            </tr>
+            <tr>
+                <th>SecondName</th>
+                <td>{{ dancer.SecondName }}</td>
+            </tr>
+            <tr>
+                <th>LastName</th>
+                <td>{{ dancer.LastName }}</td>
+            </tr>
+            <tr>
+                <th>BirthDay</th>
+                <td>{{ dancer.BirthDay ? dancer.BirthDay|date('Y-m-d') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('dancers_index') }}">back to list</a>
+
+    <a href="{{ path('dancers_edit', {'id': dancer.id}) }}">edit</a>
+
+    {{ include('dancers/_delete_form.html.twig') }}
+{% endblock %}

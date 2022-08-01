@@ -1,0 +1,97 @@
+<head>
+    <title>Ticket {{ registration.Team.Name }}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+
+        body {
+            font-family: Helvetica;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h2 {
+            text-align: left;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: black;
+            padding: 30px 0;
+        }
+
+        .fl-table {
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: normal;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            background-color: white;
+        }
+
+        .fl-table td, .fl-table th {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .fl-table td {
+            border-right: 1px solid #f8f8f8;
+            font-size: 18px;
+        }
+
+        .fl-table thead th {
+            color: #fff;
+            background: #178CAD;
+        }
+
+        .fl-table thead th:nth-child(odd) {
+            color: #ffffff;
+        }
+
+        .fl-table tr:nth-child(even) {
+            background: #F8F8F8;
+        }
+
+    </style>
+</head>
+
+{% block body %}
+    <img width="100" src="http://localhost:8000/images/nnks-logo.jpg">
+    <h1>NNKS Tickets team: {{ registration.Team.Name }}</h1>
+    {% set value = registration.Team.Organisation %}
+    <h3>Ogranisatie: {{ value.Name }}</h3>
+
+    <ul style="list-style: none; padding-left: 0;">
+        <h4 style="margin-bottom: 0px;">{{ registration.Contest.Name }}</h4>
+        <li>Datum: {{ registration.Contest.Date|date('d-m-Y') }}</li>
+        <li>Locatie: {{ registration.Contest.Location }}</li>
+        <li></li>
+    </ul>
+
+    <h3>Trainer: </h3>
+    <div class="table-wrapper">
+        <table class="fl-table">
+            <thead>
+            <tr>
+                <th>Naam + Achternaam</th>
+                <th>Geboortedatum</th>
+                <th>Ticket QR</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for dancer in dancers %}
+                <tr>
+                    <td>{{ dancer.Firstname }} {{ dancer.SecondName }} {{ dancer.LastName }}</td>
+                    <td>{{ dancer.BirthDay|date('d-m-Y') }}</td>
+                    <td><img width="100" src="{{ qr_code_data_uri(dancer.Id) }}"/>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tbody>
+        </table>
+    </div>
+{% endblock %}

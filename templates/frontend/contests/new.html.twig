@@ -1,0 +1,27 @@
+{% include 'head.html.twig' %}
+
+{% include 'head.html.twig' %}
+
+<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 dark:bg-gray-900">
+    {% include '/frontend/theme/header.html.twig' %}
+
+    <main class="h-full overflow-y-auto">
+        <div class="container px-6 mx-auto grid">
+            <div class="my-10 bg-white p-5 rounded-md shadow-md">
+                <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
+
+                </h3>
+
+                {{ include('/frontend/contests/_form.html.twig') }}
+
+                <a href="{{ path('contest_index') }}">back to list</a>
+                </div>
+            </div>
+
+    </main>
+</div>
+</div>
+
+</body>
+
+

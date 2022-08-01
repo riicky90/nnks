@@ -1,0 +1,66 @@
+{% include 'head.html.twig' %}
+<main class="bg-gray-50">
+    <div class="mx-auto md:h-screen flex flex-col justify-center items-center px-6 pt-8 pt:mt-0">
+        <a href="#" class="text-2xl font-semibold flex justify-center items-center mb-8 lg:mb-10">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
+            </svg>
+            <span class="self-center text-2xl font-bold whitespace-nowrap">NNKS <span
+                        class="hidden sm:inline">Manager</span></span>
+        </a>
+
+        <div data-controller="password-visibility"
+             class="bg-white shadow rounded-lg md:mt-0 w-full sm:max-w-screen-sm xl:p-0">
+            <div class="p-6 sm:p-8 lg:p-16 space-y-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">
+                    Inloggen bij NNKS
+                </h2>
+                <form class="mt-8 space-y-6" method="post">
+                    <div>
+                        <label for="email" class="text-sm font-medium text-gray-900 block mb-2">E-mail adres</label>
+                        <input type="email" name="email" id="inputEmail" autocomplete="email"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                               placeholder="name@company.com" required autofocus>
+                    </div>
+                        <div>
+                            <label for="password"
+                                   class="text-sm font-medium text-gray-900 block mb-2 w-full">Wachtwoord</label>
+                            <input type="password" data-password-visibility-target="input" name="password"
+                                   id="inputPassword" autocomplete="current-password"
+                                   placeholder="••••••••"
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                                   required="">
+                        </div>
+                        <div class="flex-1 w-64">
+
+                        </div>
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="remember" aria-describedby="remember" name="remember" type="checkbox"
+                                   class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
+                        </div>
+                        <div class="text-sm ml-3">
+                            <label for="remember" class="font-medium text-gray-900">Onthouden</label>
+                        </div>
+                        <a href="#" class="text-sm text-teal-500 hover:underline ml-auto">Wachtwoord vergeten ?</a>
+                    </div>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    <button type="submit"
+                            class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-base px-5 py-3 w-full sm:w-auto text-center">
+                        Inloggen
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% if error %}
+    {{ include('/theme/_alert.html.twig', {type: "error", message: error.message}) }}
+{% endif %}
+                {% for message in app.flashes('success') %}
+                    {{ include('/theme/_alert.html.twig', {message: message}) }}
+                    </div>
+                {% endfor %}

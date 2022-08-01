@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="grid grid-cols-1 xl:grid-cols-3 xl:gap-4 px-4 pt-6">
+    <div class="col-span-full mb-4 xl:mb-2">
+        <nav class="flex mb-5" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-2">
+                <li class="inline-flex items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 inline-flex items-center">
+                        <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        <a href="#" class="text-gray-700 hover:text-gray-900 ml-1 md:ml-2 text-sm font-medium">Users</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        <span class="text-gray-400 ml-1 md:ml-2 text-sm font-medium" aria-current="page">Settings</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Instellingen</h1>
+    </div>
+    <!-- Right Content -->
+    <div class="col-span-full xl:col-auto">
+
+    </div>
+    <div class="col-span-2">
+
+    </div>
+
+</div>
+<div {{ stimulus_controller('update-setting') }} class="grid grid-cols-1 xl:grid-cols-1 xl:gap-4 pt-2 px-4">
+    <div class="card mb-4 xl:mb-0">
+        <div class="flow-root">
+            <h3 class="text-xl font-bold">Instellingen voor inschrijvingen</h3>
+            <div class="divide-y divide-gray-200">
+                <!-- Item 1 -->
+                <div class="flex items-center justify-between py-4">
+                    <div class="flex-grow flex flex-col">
+                        <div class="text-lg font-semibold text-gray-900">Aantal dagen voor sluiten inschrijving</div>
+                        <div class="text-base font-normal text-gray-500">Hoeveel dagen voor aanvang van de wedstrijden sluit de inschrijving?</div>
+                    </div>
+                    <label for="days-before-closed" class="flex items-center cursor-pointer relative">
+                        <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" id="days-before-closed" data-action="change->update-setting#updateValue" data-update-setting-setting-param="days_before_reg_close" data-update-setting-url-param="{{ path('settings_edit') }}" type="number" value="{{ craue_setting('days_before_reg_close') }}">
+                    </label>
+                </div>
+                <!-- Item 2 -->
+                <div class="flex items-center justify-between py-4">
+                    <div class="flex-grow flex flex-col">
+                        <div class="text-lg font-semibold text-gray-900">Minimaal aantal dansers</div>
+                        <div class="text-base font-normal text-gray-500">Uit hoeveel dansers moet een team minimaal bestaan?</div>
+                    </div>
+                    <label for="minimum-num-dancers" class="flex items-center cursor-pointer relative">
+                        <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" id="minimum-num-dancers" data-action="change->update-setting#updateValue" data-update-setting-setting-param="minimum_num_dancers" data-update-setting-url-param="{{ path('settings_edit') }}" type="number" value="{{ craue_setting('minimum_num_dancers') }}">
+                    </label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 xl:mb-0">
+        <div class="flow-root">
+            <h3 class="text-xl font-bold">Instellingen voor notificaties</h3>
+            <div class="divide-y divide-gray-200">
+                <!-- Item 1 -->
+                <div class="flex items-center justify-evenly py-4">
+                    <div class="flex-grow flex flex-col">
+                        <div class="text-lg font-semibold text-gray-900">E-mail bij nieuwe inschrijving</div>
+                        <div class="text-base font-normal text-gray-500 ">Ontvang een e-mail bij een nieuwe inschrijving</div>
+                    </div>
+                    <label for="company-news" class="flex items-center cursor-pointer relative">
+                        <input type="checkbox" id="company-news" class="sr-only" data-action="update-setting#toggle" data-update-setting-setting-param="notify_new_registration" data-update-setting-url-param="{{ path('settings_edit') }}" {% if craue_setting('notify_new_registration') %} checked{% endif %}>
+                        <span class="toggle-bg bg-gray-200 border-2 border-gray-200 h-6 w-11 rounded-full"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
