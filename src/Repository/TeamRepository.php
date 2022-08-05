@@ -26,8 +26,7 @@ class TeamRepository extends ServiceEntityRepository
             ->andWhere('t.Organisation = :val')
             ->setParameter('val', $organisation)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
     public function totalTeams()
@@ -35,8 +34,7 @@ class TeamRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('t')
             ->select('count(t.id)')
             ->getQuery()
-            ->getSingleScalarResult()
-            ;
+            ->getSingleScalarResult();
 
     }
 
@@ -47,8 +45,7 @@ class TeamRepository extends ServiceEntityRepository
             ->andWhere('t.Organisation = :val')
             ->setParameter('val', $organisation)
             ->getQuery()
-            ->getSingleScalarResult()
-            ;
+            ->getSingleScalarResult();
 
     }
 
@@ -58,16 +55,37 @@ class TeamRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('t')
             ->leftJoin('t.Trainer', 'trainer')
             ->andWhere('t.Organisation = :organisation')
-            ->setParameter('organisation', $organisation)
-        ;
+            ->setParameter('organisation', $organisation);
 
-        if($query)
-        {
+        if ($query) {
             $qb->andWhere('t.Name LIKE :query OR t.MailTrainer LIKE :query OR trainer.FirstName LIKE :query')
-                ->setParameter('query', '%'.$query.'%');
+                ->setParameter('query', '%' . $query . '%');
         }
 
         return $qb->getQuery();
+    }
+
+    //empty function
+    public function findUnregisteredTeams($organisation, $contest)
+    {
+        $qb = $this->createQueryBuilder('t');
+        $qb->leftJoin('t.Organisation', 'o');
+        $expr = $this->getEntityManager()->getExpressionBuilder();
+        $qb->andWhere(
+            $expr->notIn(
+                't.id',
+                $this->getEntityManager()->createQueryBuilder()
+                    ->select('identity(tr.Team)')
+                    ->from('App:Registrations', 'tr')
+                    ->where('tr.Contest = :contest')
+                    ->getDQL()
+            ));
+        $qb->andWhere('o = :organisation');
+        $qb->setParameter('organisation', $organisation);
+        $qb->setParameter('contest', $contest);
+
+        return $qb;
+
     }
 
 }

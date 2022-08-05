@@ -20,16 +20,22 @@ class TeamType extends AbstractType
                 ->add('Organisation', EntityType::class, [
                     'class' => 'App\Entity\Organisation',
                     'choice_label' => 'Name',
-                    'placeholder' => 'Select an organisation',
+                    'placeholder' => 'Selecteer een organisatie',
                     'required' => true
                 ]);
         }
         $builder
             ->add('Name')
             ->add('TrainerName')
+            ->add('Category', EntityType::class, [
+                'class' => 'App\Entity\DanceCategory',
+                'choice_label' => 'Name',
+                'placeholder' => 'Selecteer categorie',
+                'required' => true
+            ])
             ->add('MailTrainer')
-            ->add('Comments')
-            ->add('Category');
+            ->add('Comments');
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

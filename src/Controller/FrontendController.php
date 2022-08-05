@@ -36,4 +36,22 @@ class FrontendController extends AbstractController
             'orders' => $orders,
         ]);
     }
+
+    //return json formatted dancers list for autocomplete
+    #[Route('/autocomplete', name: 'fe_dancers_autocomplete')]
+    public function dancersAutocomplete(DancersRepository $dancersRepository): Response
+    {
+        $dancers = $dancersRepository->findAll();
+        $dancersList = [];
+        foreach ($dancers as $dancer) {
+            $dancersList[] = [
+                'value' => $dancer->getId(),
+                'label' => $dancer->getFirstName() . ' ' . $dancer->getLastName(),
+            ];
+        }
+
+        $res = array("results" => $dancersList);
+
+        return $this->json($res);
+    }
 }

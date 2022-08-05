@@ -15,14 +15,25 @@ class OrganisationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('Name')
+            ->add('Name', null, [
+                'label' => 'Naam',
+            ])
             ->add('Adres')
-            ->add('ZipCode')
-            ->add('City')
-            ->add('Email')
-            ->add('Phone')
-            ->add('MollieApiKey')
-            ->add('teams')
+            ->add('ZipCode', null, [
+                'label' => 'Postcode',
+            ])
+            ->add('City', null, [
+                'label' => 'Plaats',
+            ])
+            ->add('Email', null, [
+                'label' => 'E-mail',
+            ])
+            ->add('Phone', null, [
+                'label' => 'Telefoon',
+            ])
+            ->add('MollieApiKey', null, [
+                'label' => 'Mollie API Sleutel',
+            ])
         ;
     }
 

@@ -25,7 +25,11 @@
                     </th>
                     <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                         Datum
-                    </th><th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                    </th>
+                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                        Sluiting inschrijvingen
+                    </th>
+                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                         Locatie
                     </th>
                     <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
@@ -49,6 +53,7 @@
                             <div class="text-base font-semibold text-gray-900">{{ contest.name }}</div>
                         </td>
                         <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date('d-m-Y') }}</td>
+                        <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date_modify(-craue_setting('days_before_reg_close')|default("0")~"day")|ago }}</td>
                         <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.location }}</td>
                         <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.disciplines }}</td>
                         <td class="p-4 whitespace-nowrap space-x-2">

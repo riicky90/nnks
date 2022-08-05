@@ -132,4 +132,14 @@ class Dancers
 
         return $this;
     }
+
+    public function getFullName()
+    {
+        return $this->FirstName. ' '. $this->SecondName. ' '. $this->LastName;
+    }
+
+    public function getAllDetails()
+    {
+        return $this->FirstName. ' '. $this->SecondName. ' '. $this->LastName. ' | '. $this->BirthDay->format('d-m-Y');
+    }
 }

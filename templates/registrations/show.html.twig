@@ -248,7 +248,7 @@
                                             Registratie is compleet
                                         {% else %}
                                         <div class="h-2.5 w-2.5 rounded-full bg-red-400 mr-2"></div>
-                                            {{ registration.registrationStatus.reason|replace({' &#013;': ', '})|raw }}
+                                            {{ registration.registrationStatus.reason|replace({' &#013;': '<br />'})|raw }}
 
                                         {% endif %}
 

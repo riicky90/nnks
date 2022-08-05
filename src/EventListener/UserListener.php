@@ -35,7 +35,7 @@ class UserListener
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
             ->subject('Nieuwe gebruiker bij NNKS.nl')
-            ->html('<p>Je bent aangemaakt als nieuwe gebruiker:</p><br />'.$entity->getEmail().'<br /> Organisatie:'.$entity->getOrganisation()->getName());
+            ->html('<p>Je bent aangemaakt als nieuwe gebruiker:</p><br />'.$entity->getEmail());
 
         $this->mailer->send($email);
 

@@ -20,10 +20,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class RegistrationsController extends AbstractController
 {
     #[Route('/', name: 'registrations_index', methods: ['GET'])]
-    public function index(RegistrationsRepository $registrationsRepository): Response
+    public function index(RegistrationsRepository $registrationsRepository, Request $request): Response
     {
+        $filter = $request->query->get('filter');
+
+        $registrations = $registrationsRepository->search($filter);
+
         return $this->render('registrations/index.html.twig', [
-            'registrations' => $registrationsRepository->findAll()
+            'registrations' => $registrations,
+            'filter' => $filter
         ]);
     }
 

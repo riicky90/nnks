@@ -61,10 +61,19 @@
                     </label>
                 </div>
 
+                <div class="flex items-center justify-between py-4">
+                    <div class="flex-grow flex flex-col">
+                        <div class="text-lg font-semibold text-gray-900">Introductie text nieuwe inschrijving</div>
+                        <div class="text-base font-normal text-gray-500">Welke text krijgen inschrijvers te zien bij het registreren?</div>
+                    </div>
+                    <label for="minimum-num-dancers" class="flex items-center cursor-pointer relative">
+                        <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" id="new_registration_text" data-action="change->update-setting#updateValue" data-update-setting-setting-param="new_registration_text" data-update-setting-url-param="{{ path('settings_edit') }}" cols="75" rows="5">{{ craue_setting('new_registration_text')|raw }}</textarea>
+                    </label>
+                </div>
+
             </div>
         </div>
     </div>
-
     <div class="card mb-4 xl:mb-0">
         <div class="flow-root">
             <h3 class="text-xl font-bold">Instellingen voor notificaties</h3>

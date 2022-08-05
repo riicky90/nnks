@@ -8,6 +8,7 @@ use App\Form\RegistrationsType;
 use App\Repository\ContestRepository;
 use App\Repository\DancersRepository;
 use App\Repository\RegistrationsRepository;
+use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -39,14 +40,15 @@ class FeRegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'fe_registration_register')]
-    public function register(Request $request, ContestRepository $contestRepository, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, ContestRepository $contestRepository, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
     {
         $contest = $contestRepository->find($request->get('contest'));
 
         $registrations = new Registrations();
         $form = $this->createForm(RegistrationsType::class, $registrations,
             [
-                'register' => true
+                'register' => true,
+                'contest' => $contest
             ]
         );
 
@@ -67,6 +69,7 @@ class FeRegistrationController extends AbstractController
 
         return $this->render('frontend/registrations/new.html.twig', [
             'registrations' => $registrations,
+            'Contest' => $contest,
             'form' => $form->createView(),
         ]);
     }

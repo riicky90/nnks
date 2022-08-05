@@ -32,13 +32,15 @@
         "symfony/security-bundle": "6.0.*",
         "symfony/translation": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
+        "symfony/ux-autocomplete": "^2.3",
         "symfony/ux-chartjs": "^2.0",
         "symfony/ux-dropzone": "^2.0",
         "symfony/ux-live-component": "^2.1",
         "symfony/ux-swup": "^2.0",
         "symfony/validator": "6.0.*",
         "symfony/webpack-encore-bundle": "^1.13",
-        "symfony/yaml": "6.0.*"
+        "symfony/yaml": "6.0.*",
+        "symfonycasts/verify-email-bundle": "^1.11"
     },
     "config": {
         "allow-plugins": {
@@ -93,7 +95,7 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.36",
+        "symfony/maker-bundle": "^1.45",
         "symfony/stopwatch": "6.0.*",
         "symfony/web-profiler-bundle": "6.0.*"
     }

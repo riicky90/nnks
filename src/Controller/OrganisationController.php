@@ -14,12 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/organisation')]
 class OrganisationController extends AbstractController
 {
+
     #[Route('/', name: 'organisation_index', methods: ['GET'])]
     public function index(OrganisationRepository $organisationRepository): Response
     {
         return $this->render('organisation/index.html.twig', [
             'organisations' => $organisationRepository->findAll(),
         ]);
+
     }
 
     #[Route('/new', name: 'organisation_new', methods: ['GET', 'POST'])]
@@ -34,6 +36,9 @@ class OrganisationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $organisation->setMollieApiKey($this->passwordHasher->hash($organisation->getMollieApiKey()));
+
             $entityManager->persist($organisation);
             $entityManager->flush();
 
@@ -65,6 +70,7 @@ class OrganisationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $organisation->setMollieApiKey($this->passwordHasher->hash($organisation->getMollieApiKey()));
             $entityManager->flush();
 
             return $this->redirectToRoute('organisation_index', [], Response::HTTP_SEE_OTHER);

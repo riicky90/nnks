@@ -25,6 +25,8 @@ class ContestRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->andWhere('c.Enabled = :val')
             ->setParameter('val', true)
+            ->andWhere('c.Date > :date')
+            ->setParameter('date', new \DateTime())
             ->orderBy('c.Date', 'ASC')
             ->getQuery()
             ->getResult()

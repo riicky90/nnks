@@ -87,4 +87,39 @@ class RegistrationsRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findByNot($field, $value)
+    {
+        $qb = $this->createQueryBuilder('a');
+        $qb->where($qb->expr()->not($qb->expr()->eq('a.' . $field, '?1')));
+        $qb->setParameter(1, $value);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    //get all teams form specific organisation that are not yet registered for the current contest
+    public function getTeamsNotRegistered($organisation, $contest)
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.Registrations', 'r')
+            ->andWhere('t.Organisation = :org')
+            ->andWhere('r.Contest = :contest')
+            ->setParameter('org', $organisation)
+            ->setParameter('contest', $contest)
+            ->getQuery()
+            ->getResult();
+    }
+
+    //search function for registrations
+    public function search($search)
+    {
+        $qb = $this->createQueryBuilder('r');
+        $qb->leftJoin('r.Team', 't');
+        $qb->leftJoin('t.Organisation', 'o');
+        $qb->leftJoin('r.Contest', 'c');
+        $qb->where('t.Name LIKE :search OR o.Name LIKE :search OR c.Name LIKE :search');
+        $qb->setParameter('search', '%'.$search.'%');
+        return $qb->getQuery()->getResult();
+    }
+
+
 }

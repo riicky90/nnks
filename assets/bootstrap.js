@@ -2,6 +2,7 @@ import { startStimulusApp } from '@symfony/stimulus-bridge';
 import { Alert, Modal, Slideover } from "tailwindcss-stimulus-components";
 import Sortable from "stimulus-sortable";
 import LiveController from '@symfony/ux-live-component';
+import TomSelect from "tom-select";
 import '@symfony/ux-live-component/styles/live.css';
 
 // Registers Stimulus controllers from controllers.json and in the controllers/ directory
@@ -16,4 +17,5 @@ app.register('alert', Alert);
 app.register('modal', Modal);
 app.register('slideover', Slideover);
 app.register("sortable", Sortable);
+app.register("TomSelect", TomSelect);
 app.register('live', LiveController);

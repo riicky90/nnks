@@ -21,7 +21,16 @@ class UserType extends AbstractType
                 'required' => false,
                 'mapped' => false,
             ])
-            ->add('Organisation');
+            ->add('Organisation')
+            ->add('isVerified', ChoiceType::class, [
+                'choices' => [
+                    'Nee' => false,
+                    'Ja' => true,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'label' => 'E-mail bevestigd',
+            ]);
 
         $builder->add('roles', ChoiceType::class, [
             'label' => 'Rol',

@@ -21,6 +21,7 @@ security:
       lazy: true
       provider: app_user_provider
       custom_authenticator: App\Security\LoginFormAuthenticator
+      user_checker: App\Security\UserChecker
       entry_point: form_login
       logout:
         path: app_logout
@@ -33,7 +34,10 @@ security:
   # Note: Only the *first* access control that matches will be used
   access_control:
       - { path: ^/login, roles: PUBLIC_ACCESS }
+      - { path: ^/verify/email, roles: PUBLIC_ACCESS }
+      - { path: ^/api/contests, roles: PUBLIC_ACCESS }
       - { path: ^/logout, roles: PUBLIC_ACCESS }
+      - { path: ^/register, roles: PUBLIC_ACCESS }
       - { path: ^/frontend, roles: ROLE_USER }
       - { path: ^/, roles: ROLE_ADMIN }
 when@test:

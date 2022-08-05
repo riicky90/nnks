@@ -19,7 +19,7 @@ class SecurityController extends AbstractController
             {
                 return $this->redirectToRoute("dashboard_index");
             }else{
-                return $this->redirectToRoute("frontend_index");
+                return $this->redirectToRoute("fe_orders_index");
 
             }
         }

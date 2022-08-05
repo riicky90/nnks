@@ -44,13 +44,6 @@ export default class extends Controller {
                 this.modalBodyTarget.innerHTML = result.data;
                 this.modalTitleTarget.innerHTML = e.params.title;
                 this.containerTarget.classList.remove(this.toggleClass);
-
-
-                $('.select2').select2({
-                    dropdownParent : this.containerTarget,
-                    placeholder: 'Selecteer een optie',
-                    closeOnSelect: false
-                });
             });
 
         if (this.preventDefaultActionOpening) {

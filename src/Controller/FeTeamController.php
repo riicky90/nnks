@@ -53,10 +53,11 @@ class FeTeamController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $team = new Team();
-        $form = $this->createForm(TeamType::class, $team);
+        $form = $this->createForm(TeamType::class, $team, ['show_organisation' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $team->setOrganisation($this->getUser()->getOrganisation());
             $entityManager->persist($team);
             $entityManager->flush();
 

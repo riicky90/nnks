@@ -147,7 +147,7 @@
     </div>
 </aside>
 <div class="flex flex-col flex-1 w-full">
-    <header class="z-10 py-4 bg-white shadow-md dark:bg-gray-800">
+    <div class="z-10 py-4 bg-white shadow-md dark:bg-gray-800">
         <div class="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
             <!-- Mobile hamburger -->
             <button class="p-1 mr-5 -ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-purple"
@@ -163,16 +163,16 @@
             </a>
             <ul class="flex">
                 <li class="mr-6">
+                    <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_contests_index') }}">Wedstrijden</a>
+                </li>
+                <li class="mr-6">
+                    <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_registrations_index') }}">Inschrijvingen</a>
+                </li>
+                <li class="mr-6">
                     <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_team_index') }}">Teams</a>
                 </li>
                 <li class="mr-6">
                     <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_dancers_index') }}">Dansers</a>
-                </li>
-                <li class="mr-6">
-                    <a class="text-blue-500 hover:text-blue-800" href="{{path('fe_registrations_index') }}">Inschrijvingen</a>
-                </li>
-                <li class="mr-6">
-                    <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_contests_index') }}">Wedstrijden</a>
                 </li>
                 <li class="mr-6">
                     <a class="text-blue-500 hover:text-blue-800" href="{{ path('fe_orders_index') }}">Transacties</a>
@@ -180,4 +180,5 @@
             </ul>
             <a class="text-sm text-black hover:text-purple-600" href="{{ path('app_logout') }}">Uitloggen</a>
         </div>
+    </div>
     </header>

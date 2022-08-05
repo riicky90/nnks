@@ -8,3 +8,7 @@ kernel:
 
 live_component:
     resource: '@LiveComponentBundle/Resources/config/routing/live_component.xml'
+
+craue_config_settings:
+    resource: "@CraueConfigBundle/Resources/config/routing/settings.xml"
+    prefix: /setting
