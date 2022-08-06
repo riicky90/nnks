@@ -21,6 +21,7 @@
         "postcss-import": "^14.0.2",
         "postcss-loader": "^5.3.0",
         "regenerator-runtime": "^0.13.2",
+        "stimulus": "^3.1.0",
         "swup": "^2.0",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat",
         "tom-select": "^2.0.1",

@@ -9,11 +9,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
+use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent('registration_form')]
 class RegistrationFormComponent extends AbstractController
 {
     use ComponentWithFormTrait;
+    use DefaultActionTrait;
 
     #[LiveProp(fieldName: 'data')]
     public ?Registrations $registrations = null;
