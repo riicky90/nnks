@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -41,6 +43,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
+
+    #[ORM\OneToMany(mappedBy: 'CreatedBy', targetEntity: Registrations::class)]
+    private Collection $registrations;
+
+    public function __construct()
+    {
+        $this->registrations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +164,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLES = array(
         'Super administrator' => 'ROLE_ADMIN',
         'Administrator' => 'ROLE_SECRETARY',
+        'Scanner' => 'ROLE_SCANNER',
         'Gebruiker' => 'ROLE_USER'
     );
 
@@ -165,6 +176,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Registrations>
+     */
+    public function getRegistrations(): Collection
+    {
+        return $this->registrations;
+    }
+
+    public function addRegistration(Registrations $registration): self
+    {
+        if (!$this->registrations->contains($registration)) {
+            $this->registrations->add($registration);
+            $registration->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistration(Registrations $registration): self
+    {
+        if ($this->registrations->removeElement($registration)) {
+            // set the owning side to null (unless already changed)
+            if ($registration->getCreatedBy() === $this) {
+                $registration->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }

@@ -49,13 +49,17 @@ class RegistrationsType extends AbstractType
         } else {
             $this->getFormBuilder($builder, $options);
             $builder->add('Dancers', DancersAutocompleteField::class, [
+                'label' => 'Dansers',
                 'required' => true,
                 'placeholder' => 'Selecteer dansers',
             ]);
         }
 
         if (!$options["register"]) {
-            $builder->add('Contest');
+            $builder->add('Contest', null, [
+                'label' => 'Wedstrijd',
+                'required' => true,
+            ]);
         }
 
         $builder

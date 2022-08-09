@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Registrations{% endblock %}
+
+{% block body %}
+    <h1>Edit Registrations</h1>
+
+    {{ include('registrations/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('registrations_index') }}">back to list</a>
+
+    {{ include('registrations/_delete_form.html.twig') }}
+{% endblock %}

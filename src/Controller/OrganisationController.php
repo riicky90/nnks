@@ -16,10 +16,15 @@ class OrganisationController extends AbstractController
 {
 
     #[Route('/', name: 'organisation_index', methods: ['GET'])]
-    public function index(OrganisationRepository $organisationRepository): Response
+    public function index(Request $request, OrganisationRepository $organisationRepository): Response
     {
+        $filter = $request->query->get('filter');
+
+        $organisations = $organisationRepository->search($filter);
+
         return $this->render('organisation/index.html.twig', [
-            'organisations' => $organisationRepository->findAll(),
+            'organisations' => $organisations,
+            'filter' => $filter
         ]);
 
     }

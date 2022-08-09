@@ -26,18 +26,26 @@ class DanceCategoryController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $danceCategory = new DanceCategory();
-        $form = $this->createForm(DanceCategoryType::class, $danceCategory);
+        $form = $this->createForm(DanceCategoryType::class, $danceCategory,
+            [
+                'action' => $this->generateUrl('dance_category_new'),
+                'method' => 'POST',
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $entityManager->persist($danceCategory);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Categorie opgeslagen.');
 
             return $this->redirectToRoute('dance_category_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('dance_category/new.html.twig', [
-            'dance_category' => $danceCategory,
+        return $this->renderForm('dance_category/_form.html.twig', [
+            'category' => $danceCategory,
             'form' => $form,
         ]);
     }
@@ -51,19 +59,26 @@ class DanceCategoryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'dance_category_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, DanceCategory $danceCategory, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, DanceCategory $danceCategory, EntityManagerInterface $entityManager, $id): Response
     {
-        $form = $this->createForm(DanceCategoryType::class, $danceCategory);
+        $form = $this->createForm(DanceCategoryType::class, $danceCategory,
+            [
+                'action' => $this->generateUrl('dance_category_edit', ['id' => $id]),
+                'method' => 'POST',
+            ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
 
-            return $this->redirectToRoute('dance_category_index', [], Response::HTTP_SEE_OTHER);
+            $entityManager->flush();
+            $this->addFlash('success', 'Categorie opgeslagen.');
+            return $this->redirect($request->headers->get('referer'));
+
         }
 
-        return $this->renderForm('dance_category/edit.html.twig', [
-            'dance_category' => $danceCategory,
+        return $this->renderForm('registrations/_form.html.twig', [
+            'category' => $danceCategory,
             'form' => $form,
         ]);
     }
@@ -71,7 +86,7 @@ class DanceCategoryController extends AbstractController
     #[Route('/{id}', name: 'dance_category_delete', methods: ['POST'])]
     public function delete(Request $request, DanceCategory $danceCategory, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$danceCategory->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $danceCategory->getId(), $request->request->get('_token'))) {
             $entityManager->remove($danceCategory);
             $entityManager->flush();
         }

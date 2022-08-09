@@ -1,0 +1,33 @@
+{% include 'head.html.twig' %}
+
+<div class="w-full bg-orange-500" id="container">
+    <div class="flex flex-col items-center justify-center h-screen">
+        <div class="text-center text-white">
+            <h1 class="text-3xl font-bold">Danser naam: <br />{{ dancer.FirstName }} {{ dancer.LastName }}</h1>
+
+            <ul class="mt-10 text-lg text-left">
+                <li>Geboortedatum: {{ dancer.birthDay|date('d-m-Y') }}</li>
+                <li class="mt-1">Teams:{% for teams in dancer.registrations %}
+                    {% if dancer.registrations|length > 1 %}
+                        <ul>
+                            <li class="mt-2"><span class="bg-blue-500 rounded p-1 ml-2">{{ teams.team.name }}  ({{ teams.team.category.name }})</span></li>
+                        </ul>
+                    {% else %}
+                        <span class="bg-blue-500 rounded p-1">{{ teams.team.name }}  ({{ teams.team.category.name }})</span>
+                    {% endif %}
+                    {% endfor %}
+                </li>
+
+            </ul>
+            <div class="text-left mt-20 w-full">
+                <a href="{{ path('eventscan_save', {contest: contest.id, dancer: dancer.id }) }}"
+                   class="bg-green-500 w-full hover:bg-green-700 text-white font-bold py-4 px-6 mt-10 rounded">
+                    Inchecken</a>
+            </div>
+            <div class="text-sm mt-20">
+                {{ app.user.email }}<br/>
+                <a href="{{ path('app_logout') }}">Uitloggen</a>
+            </div>
+        </div>
+    </div>
+</div>

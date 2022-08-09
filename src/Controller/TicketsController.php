@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Registrations;
 use App\Repository\DancersRepository;
 use App\Repository\RegistrationsRepository;
-use Dompdf\Exception;
+use mPDF;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +13,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Dompdf\Dompdf;
 
 #[Route('/tickets')]
 class TicketsController extends AbstractController
@@ -27,24 +26,12 @@ class TicketsController extends AbstractController
             'team' => $registrations->getTeam()->getId()
         ]);
 
-        $dompdf = new Dompdf(['isRemoteEnabled' => true]);
+        $mpdf = new Mpdf();
 
-        $dompdf->load_html($this->renderView('/tickets/ticketlayout.html.twig', array(
-            'registration' => $registrationsRepository->find($registration),
-            'dancers' => $dancers
-        )));
+        $mpdf->WriteHTML("test");
 
-        $dompdf->setPaper('A4', 'portrait');
+        $mpdf->Output('tickets.pdf', 'I');
 
-
-        $dompdf->render();
-
-        try {
-            $dompdf->stream('Tickets ' . $registrations->getTeam()->getName() . ' - ' . $registrations->getContest()->getName() . '.pdf', array('Attachment' => 0));
-        }catch (Exception $e){
-
-        }
-        exit;
 
     }
 

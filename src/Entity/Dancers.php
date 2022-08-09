@@ -33,9 +33,13 @@ class Dancers
     #[ORM\ManyToMany(targetEntity: Registrations::class, mappedBy: 'Dancers')]
     private $registrations;
 
+    #[ORM\OneToMany(mappedBy: 'Dancer', targetEntity: EventScan::class, orphanRemoval: true)]
+    private Collection $eventScans;
+
     public function __construct()
     {
         $this->registrations = new ArrayCollection();
+        $this->eventScans = new ArrayCollection();
     }
     public function __toString() {
         return $this->FirstName. ' '. $this->SecondName. ' '. $this->LastName;
@@ -141,5 +145,35 @@ class Dancers
     public function getAllDetails()
     {
         return $this->FirstName. ' '. $this->SecondName. ' '. $this->LastName. ' | '. $this->BirthDay->format('d-m-Y');
+    }
+
+    /**
+     * @return Collection<int, EventScan>
+     */
+    public function getEventScans(): Collection
+    {
+        return $this->eventScans;
+    }
+
+    public function addEventScan(EventScan $eventScan): self
+    {
+        if (!$this->eventScans->contains($eventScan)) {
+            $this->eventScans->add($eventScan);
+            $eventScan->setDancer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventScan(EventScan $eventScan): self
+    {
+        if ($this->eventScans->removeElement($eventScan)) {
+            // set the owning side to null (unless already changed)
+            if ($eventScan->getDancer() === $this) {
+                $eventScan->setDancer(null);
+            }
+        }
+
+        return $this;
     }
 }

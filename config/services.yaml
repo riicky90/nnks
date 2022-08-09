@@ -36,3 +36,8 @@ services:
     App\Autocompleter\SearchFilter:
         tags:
             - { name: ux.entity_autocompleter, alias: 'search' }
+
+    App\EventListener\RegistrationEventListener:
+        tags:
+            - { name: doctrine.event_listener, event: postUpdate, connection: default }
+            - { name: doctrine.event_listener, event: postPersist, connection: default }

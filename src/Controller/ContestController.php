@@ -15,11 +15,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContestController extends AbstractController
 {
     #[Route('/', name: 'contest_index', methods: ['GET'])]
-    public function index(ContestRepository $contestRepository): Response
+    public function index(Request $request, ContestRepository $contestRepository): Response
     {
+        $filter = $request->query->get('filter');
+
+        $contests = $contestRepository->search($filter);
+
         return $this->render('contest/index.html.twig', [
-            'contests' => $contestRepository->findAll(),
+            'contests' => $contests,
+            'filter' => $filter
         ]);
+
     }
 
     #[Route('/new', name: 'contest_new', methods: ['GET', 'POST'])]

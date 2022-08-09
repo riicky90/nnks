@@ -45,6 +45,7 @@
                             <label for="remember" class="font-medium text-gray-900">Onthouden</label>
                         </div>
                         <a href="#" class="text-sm text-teal-500 hover:underline ml-auto">Wachtwoord vergeten ?</a>
+                        <a href="{{ path('app_register') }}" class="text-sm text-teal-500 hover:underline ml-auto">Nog geen account ?</a>
                     </div>
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                     <button type="submit"

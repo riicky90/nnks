@@ -1,16 +1,78 @@
 {% use 'tailwind_2_layout.html.twig' %}
 
 {% block form_row %}
-    {% set row_class = row_class|default('mt-2 px-3') %}
+    {% set row_class = row_class|default('mt-2') %}
     {{ parent() }}
 {% endblock form_row %}
 
-{% block form_label %}
-    {% set label_class = label_class|default('font-semibold text-gray-600') %}
+{% block form_widget_simple %}
+    {%- set type = type|default('text') -%}
+    {% set row_class = row_class|default('mt-2') %}
+<input type="{{ type }}"
+           id="{{ id}}"
+           name={{ full_name }}
+           class="{{ block('input_class') }} mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+           {% if value is not empty %}value="{{ value }}" {% endif %}
+            {% if required is defined and required == true %}required {% endif %}/>
+{% endblock form_widget_simple %}
+
+{% block textarea_widget %}
+    {% set row_class = row_class|default('mt-2') %}
+    <textarea
+           id="{{ id}}"
+           name={{ full_name }}
+           class="{{ block('input_class') }} mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+    {% if required is defined and required == true %}required {% endif %}>{% if value is not empty %}{{ value }}{% endif %}</textarea>
+{% endblock textarea_widget %}
+
+{%- block choice_widget -%}
+    {% if expanded %}
+        {{- block('choice_widget_expanded') -}}
+    {% else %}
+        {{- block('choice_widget_collapsed') -}}
+    {% endif %}
+{%- endblock choice_widget -%}
+
+{% block checkbox_widget %}
+    {% set row_class = row_class|default('mt-2 px-3') %}
     {{ parent() }}
-{% endblock form_label %}
+{% endblock checkbox_widget %}
 
 {% block button_widget %}
-    {% set row_class = row_class|default('mt-5')  %}
+    {% set row_class = row_class|default('mt-5') %}
     {{ parent() }}
 {% endblock button_widget %}
+
+
+{%- block choice_widget_expanded -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            {{- form_widget(child) -}}
+            {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block choice_widget_collapsed -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+        {% set required = false %}
+    {%- endif -%}
+    <select class="mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {%- if placeholder is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+        {%- endif -%}
+        {%- if preferred_choices|length > 0 -%}
+            {% set options = preferred_choices %}
+            {{- block('choice_widget_options') -}}
+            {%- if choices|length > 0 and separator is not none -%}
+                <option disabled="disabled">{{ separator }}</option>
+            {%- endif -%}
+        {%- endif -%}
+        {%- set options = choices -%}
+        {{- block('choice_widget_options') -}}
+    </select>
+{%- endblock choice_widget_collapsed -%}
+
+{% block input_class -%}
+    {% if form.vars.errors|length %}border-red border-1{% endif %} mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5
+{% endblock input_class -%}

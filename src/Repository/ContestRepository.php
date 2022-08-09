@@ -33,15 +33,24 @@ class ContestRepository extends ServiceEntityRepository
         ;
     }
 
-    /*
-    public function findOneBySomeField($value): ?Contest
+    public function todayContest()
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('c.Enabled = :val')
+            ->setParameter('val', true)
+            ->andWhere('c.Date = :date')
+            ->setParameter('date', (new \DateTime())->format('Y-m-d'))
+            ->orderBy('c.Date', 'ASC')
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+
+    public function search($search)
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb->where('c.Name LIKE :search OR c.Location LIKE :search OR c.Description LIKE :search OR c.Disciplines LIKE :search');
+        $qb->setParameter('search', '%'.$search.'%');
+        return $qb->getQuery()->getResult();
+    }
 }

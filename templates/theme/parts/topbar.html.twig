@@ -12,15 +12,6 @@
                 <a href="#" class="text-md font-semibold flex items-center lg:mr-1.5">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>                    <span class="self-center text-xl font-bold whitespace-nowrap">NNKS <span class="hidden sm:inline">Manager</span></span>
                 </a>
-                <form action="#" method="GET" class="hidden lg:block lg:pl-8">
-                    <label for="topbar-search" class="sr-only">Zoeken</label>
-                    <div class="mt-1 relative lg:w-96">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
-                        </div>
-                        <input type="text" name="email" id="topbar-search" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full pl-10 p-2.5" placeholder="Zoeken">
-                    </div>
-                </form>
             </div>
             <div class="flex items-center">
                 <!-- Search mobile -->
@@ -177,7 +168,7 @@
                                 <a href="{{ path('dashboard_index') }}" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2" role="menuitem">Dashboard</a>
                             </li>
                             <li>
-                                <a href="#" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2" role="menuitem">Instellingen</a>
+                                <a href="{{ path('settings_index') }}" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2" role="menuitem">Instellingen</a>
                             </li>
                             <li>
                                 <a href="{{ path('app_logout') }}" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2" role="menuitem">Uitloggen</a>

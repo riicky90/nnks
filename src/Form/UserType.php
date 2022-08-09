@@ -37,8 +37,8 @@ class UserType extends AbstractType
             'choices' => User::ROLES,
             'choice_translation_domain' => 'user',
             'multiple' => true,
-            'expanded' => true,
             'required' => true,
+            'autocomplete' => true
         ]);
     }
 }

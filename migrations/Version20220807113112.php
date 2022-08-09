@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220805105835 extends AbstractMigration
+final class Version20220807113112 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,14 +20,14 @@ final class Version20220805105835 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE craue_config_setting CHANGE value value VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE user ADD is_verified TINYINT(1) NOT NULL');
+        $this->addSql('ALTER TABLE registrations ADD CONSTRAINT FK_53DE51E7B03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id)');
+        $this->addSql('CREATE INDEX IDX_53DE51E7B03A8386 ON registrations (created_by_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE craue_config_setting CHANGE value value TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE user DROP is_verified');
+        $this->addSql('ALTER TABLE registrations DROP FOREIGN KEY FK_53DE51E7B03A8386');
+        $this->addSql('DROP INDEX IDX_53DE51E7B03A8386 ON registrations');
     }
 }

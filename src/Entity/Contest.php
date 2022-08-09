@@ -46,9 +46,13 @@ class Contest
     #[ORM\Column(type: 'text')]
     private $Disciplines;
 
+    #[ORM\OneToMany(mappedBy: 'Contest', targetEntity: EventScan::class, orphanRemoval: true)]
+    private Collection $eventScans;
+
     public function __construct()
     {
         $this->registrations = new ArrayCollection();
+        $this->eventScans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -195,6 +199,36 @@ class Contest
     public function setDisciplines(string $Disciplines): self
     {
         $this->Disciplines = $Disciplines;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EventScan>
+     */
+    public function getEventScans(): Collection
+    {
+        return $this->eventScans;
+    }
+
+    public function addEventScan(EventScan $eventScan): self
+    {
+        if (!$this->eventScans->contains($eventScan)) {
+            $this->eventScans->add($eventScan);
+            $eventScan->setContest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventScan(EventScan $eventScan): self
+    {
+        if ($this->eventScans->removeElement($eventScan)) {
+            // set the owning side to null (unless already changed)
+            if ($eventScan->getContest() === $this) {
+                $eventScan->setContest(null);
+            }
+        }
 
         return $this;
     }

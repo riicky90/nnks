@@ -67,8 +67,10 @@ class RegistrationsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'registrations_show', methods: ['GET'])]
-    public function show(Registrations $registration, RegistrationsRepository $registrationsRepository, $id, DancersRepository $dancersRepository, OrganisationRepository $organisation, OrdersRepository $orders): Response
+    public function show(Registrations $registration, EntityManagerInterface $entityManager, RegistrationsRepository $registrationsRepository, $id, DancersRepository $dancersRepository, OrganisationRepository $organisation, OrdersRepository $orders): Response
     {
+        $repo = $entityManager->getRepository('Gedmo\Loggable\Entity\LogEntry');
+
         return $this->render('registrations/show.html.twig', [
             'registration' => $registration,
             'totalDancers' => $registration->getDancers()->count() * 5.00,

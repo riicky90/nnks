@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\RegistrationsRepository;
+use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: RegistrationsRepository::class)]
+#[Gedmo\Loggable]
 #[ORM\HasLifecycleCallbacks]
 class Registrations
 {
@@ -20,28 +22,34 @@ class Registrations
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Gedmo\Versioned]
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'registrations')]
     private $Team;
 
     #[ORM\ManyToMany(targetEntity: Dancers::class, inversedBy: 'registrations', fetch: 'EAGER')]
     private $Dancers;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: 'text', nullable: true)]
     private $Comments;
 
+    #[Gedmo\Versioned]
     #[ORM\ManyToOne(targetEntity: Contest::class, fetch: 'EAGER', inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
     private $Contest;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Gedmo\Blameable(on: 'create')]
-    private $RegisteredBy;
-
     #[ORM\OneToMany(mappedBy: 'Registration', targetEntity: Orders::class)]
     private $orders;
 
+    #[Gedmo\Versioned]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $MusicFile;
+
+    #[ORM\ManyToOne(inversedBy: 'registrations')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Gedmo\Blameable(on: 'create')]
+    private ?User $CreatedBy = null;
+
 
     public function __construct()
     {
@@ -106,19 +114,6 @@ class Registrations
 
         return $this;
     }
-
-    public function getRegisteredBy(): ?string
-    {
-        return $this->RegisteredBy;
-    }
-
-    public function setRegisteredBy(?string $RegisteredBy): self
-    {
-        $this->RegisteredBy = $RegisteredBy;
-
-        return $this;
-    }
-
 
     public function getContest(): ?Contest
     {
@@ -193,7 +188,8 @@ class Registrations
 
         if (count($dancers) >= 4 && $music && $totalPayed >= $totalDue) {
             return [
-                'status' => true
+                'status' => true,
+                'reason' => ['Registration is complete']
             ];
         } else {
 
@@ -215,5 +211,17 @@ class Registrations
                 'reason' => $reason
             ];
         }
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->CreatedBy;
+    }
+
+    public function setCreatedBy(?User $CreatedBy): self
+    {
+        $this->CreatedBy = $CreatedBy;
+
+        return $this;
     }
 }

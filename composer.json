@@ -14,6 +14,7 @@
         "doctrine/orm": "^2.11",
         "endroid/qr-code-bundle": "^4.0",
         "knplabs/knp-paginator-bundle": "^5.8",
+        "knplabs/knp-snappy-bundle": "^1.9",
         "knplabs/knp-time-bundle": "^1.19",
         "mollie/mollie-api-php": "2.40.2",
         "sensio/framework-extra-bundle": "^6.2",
