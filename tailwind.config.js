@@ -1,5 +1,8 @@
 module.exports = {
-    content: ['./src/**/*.{html,js}'],
+    content: [
+        './src/**/*.{html,js}',
+        "./templates/**/*.{html,twig}",
+    ],
     plugins: [
         require('flowbite/plugin')
     ],
