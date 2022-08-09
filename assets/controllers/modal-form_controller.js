@@ -1,6 +1,4 @@
 import {Controller} from '@hotwired/stimulus';
-require('select2');
-
 import $ from 'jquery';
 
 const axios = require('axios').default;
