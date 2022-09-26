@@ -21,13 +21,12 @@ class DancersRepository extends ServiceEntityRepository
         parent::__construct($registry, Dancers::class);
     }
 
-
-    public function findByOrganisation($organisation): int|array|string
+    public function findByUser($user): int|array|string
     {
         return $this->createQueryBuilder('d')
             ->leftJoin('d.team', 'o')
-            ->andWhere('o.Organisation = :val')
-            ->setParameter('val', $organisation)
+            ->andWhere('o.User = :user')
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult()
         ;

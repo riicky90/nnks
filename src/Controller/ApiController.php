@@ -13,7 +13,7 @@ class ApiController extends AbstractController
     #[Route('/contests', name: 'api_contests_index', methods: ['GET'])]
     public function index(ContestRepository $contestRepository): Response
     {
-        $contests = $contestRepository->findBy(['Enabled' => true], ['Date' => 'ASC'], '20');
+        $contests = $contestRepository->allOpenContests();
         $items_json = [];
         foreach ($contests as $contest) {
             $items_json[] =
@@ -23,8 +23,10 @@ class ApiController extends AbstractController
                     'start' => $contest->getDate()->format('Y-m-d H:i:s'),
                     'description' => $contest->getDescription(),
                     'enabled' => $contest->getEnabled(),
+                    'location' => $contest->getLocation(),
                     'registrationFee' => $contest->getRegistrationFee(),
                     'entranceFee' => $contest->getEntranceFee(),
+                    'single_event_link' => '/contest/' . $contest->getId().'/'. $contest->getName(),
                     'diciplines' => $contest->getDisciplines(),
                     'organisation' => array([
                         'id' => $contest->getOrganisation()->getId(),

@@ -27,14 +27,19 @@ class FrontendController extends AbstractController
 {
 
     #[Route('/orders', name: 'fe_orders_index')]
-    public function orders(ContestRepository $contestRepository, UserRepository $userRepository, OrdersRepository $ordersRepository): Response
+    public function orders(OrdersRepository $ordersRepository): Response
     {
-        $userOrganisation = $userRepository->find($this->getUser())->getOrganisation();
-        $orders = $ordersRepository->personalOrder($userOrganisation);
+        $orders = $ordersRepository->findAll();
 
         return $this->render('frontend/orders/index.html.twig', [
             'orders' => $orders,
         ]);
+    }
+
+    #[Route('/profile/edit', name: 'user_profile')]
+    public function profile(): Response
+    {
+        return $this->render('/frontend/user/profile.html.twig');
     }
 
     //return json formatted dancers list for autocomplete

@@ -6,6 +6,7 @@ use App\Entity\Organisation;
 use App\Form\OrganisationType;
 use App\Repository\OrganisationRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,44 +17,51 @@ class OrganisationController extends AbstractController
 {
 
     #[Route('/', name: 'organisation_index', methods: ['GET'])]
-    public function index(Request $request, OrganisationRepository $organisationRepository): Response
+    public function index(Request $request, OrganisationRepository $organisationRepository, PaginatorInterface $paginator): Response
     {
         $filter = $request->query->get('filter');
+        $reload = $request->query->get('reload');
+        $template = "organisation/index.html.twig";
 
         $organisations = $organisationRepository->search($filter);
 
-        return $this->render('organisation/index.html.twig', [
-            'organisations' => $organisations,
+        $pagination = $paginator->paginate(
+            $organisations,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        if ($reload) {
+            $template = "organisation/_list.html.twig";
+        }
+
+        return $this->render($template, [
+            'organisations' => $pagination,
             'filter' => $filter
         ]);
-
     }
 
     #[Route('/new', name: 'organisation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $organisation = new Organisation();
-        $form = $this->createForm(OrganisationType::class, $organisation,
-            [
-                'action' => $this->generateUrl('organisation_new'),
-                'method' => 'GET',
-            ]);
+        $form = $this->createForm(OrganisationType::class, $organisation, [
+            'action' => $this->generateUrl('organisation_new')
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $organisation->setMollieApiKey($this->passwordHasher->hash($organisation->getMollieApiKey()));
-
             $entityManager->persist($organisation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('organisation_index', [], Response::HTTP_SEE_OTHER);
+            return new Response(null, 204);
         }
 
         return $this->renderForm('organisation/_form.html.twig', [
             'organisation' => $organisation,
             'form' => $form,
-        ]);
+        ], new Response(null, $form->isSubmitted() ? 422 : 200));
     }
 
     #[Route('/{id}', name: 'organisation_show', methods: ['GET'])]
@@ -67,24 +75,24 @@ class OrganisationController extends AbstractController
     #[Route('/{id}/edit', name: 'organisation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, $id, Organisation $organisation, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(OrganisationType::class, $organisation,
-            [
-                'action' => $this->generateUrl('organisation_edit', ['id' => $id]),
-                'method' => 'GET',
-            ]);
+        $form = $this->createForm(OrganisationType::class, $organisation, [
+            'action' => $this->generateUrl('organisation_edit', ['id' => $id]),
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $organisation->setMollieApiKey($this->passwordHasher->hash($organisation->getMollieApiKey()));
+
+            $entityManager->persist($organisation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('organisation_index', [], Response::HTTP_SEE_OTHER);
+            return new Response(null, 204);
         }
 
         return $this->renderForm('organisation/_form.html.twig', [
             'organisation' => $organisation,
             'form' => $form,
-        ]);
+        ], new Response(null, $form->isSubmitted() ? 422 : 200));
     }
 
     #[Route('/{id}', name: 'organisation_delete', methods: ['POST'])]

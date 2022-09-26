@@ -1,0 +1,84 @@
+<table class="table-fixed min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100">
+    <tr>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            #
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(teams, 'Team naam', 't.Name') }} {% if teams.isSorted('t.Name') %}<svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path></svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(teams, 'Trainer naam', 't.TrainerName') }} {% if teams.isSorted('t.TrainerName') %}<svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path></svg>{% endif %}
+
+        </th><th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(teams, 'Mail Trainer', 't.MailTrainer') }} {% if teams.isSorted('t.MailTrainer') %}<svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path></svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(teams, 'Categorie', 'c.Name') }} {% if teams.isSorted('c.Name') %}<svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path></svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(teams, 'DansSchool', 'u.DansSchool') }} {% if teams.isSorted('u.DansSchool') %}<svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path></svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4">
+        </th>
+    </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+    {% for team in teams %}
+        <tr data-action="submit-confirm:async:submitted->reload-table#reloadItem" class="list-item-row hover:bg-gray-100">
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">
+                {{ team.id }}
+            </td>
+            <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                <div class="text-base font-semibold text-gray-900">{{ team.Name }}</div>
+            </td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.TrainerName }}</td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.MailTrainer }}</td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.Category.Name }}</td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.User.Dansschool }}</td>
+            <td class="p-4 whitespace-nowrap space-x-2">
+                <button type="button" data-action="modal-form#open"
+                        data-modal-form-title-param="Team bewerken"
+                        data-modal-form-url-param="{{ path('team_edit', {id: team.id}) }}"
+                        class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                    <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+                        <path fill-rule="evenodd"
+                              d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                    Bewerk team
+                </button>
+                <form class="inline-flex" action="{{ path('team_delete', {id: team.id}) }}"
+                      method="POST"
+                        {{ stimulus_controller('submit-confirm',
+                            {
+                                title: 'Team verwijderen',
+                                text: 'Weet u zeker dat u dit team wilt verwijderen?',
+                                confirmButtonText: 'Verwijderen',
+                                icon: 'warning',
+                                submitAsync: true
+                            }) }} data-action="submit-confirm#onSubmit">
+
+                    <input type="hidden" name="_token"
+                           value="{{ csrf_token('delete' ~ team.id) }}"/>
+                    <button class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
+                        Verwijderen
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

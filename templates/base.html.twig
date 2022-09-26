@@ -2,12 +2,13 @@
 <html>
 {% include 'head.html.twig' %}
     <body class="bg-gray-50 ">
+
+
     {% include '/theme/parts/topbar.html.twig' %}
+    <div class="flex overflow-hidden pt-16">
     {% include '/theme/parts/sidebar.html.twig' %}
 
-
-
-    <div id="main-content" class="h-full relative overflow-y-auto pt-16 lg:ml-64">
+    <div id="main-content" class="h-full w-full relative overflow-y-auto lg:ml-64">
         <main>
         {% block body %}
 
@@ -15,12 +16,12 @@
         {% endblock %}
         </main>
     </div>
+    </div>
     {% if error is defined %}
         {{ include('/theme/_alert.html.twig') }}
     {% endif %}
     {% for message in app.flashes('success') %}
             {{ include('/theme/_alert.html.twig', {message: message}) }}
-        </div>
     {% endfor %}
     {% if error is defined %}
         {{ include('/theme/_alert.html.twig', {type: "error", message: error.message}) }}

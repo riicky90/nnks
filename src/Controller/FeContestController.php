@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class FeContestController extends AbstractController
 {
 
-    #[Route('/contests', name: 'fe_contests_index')]
+    #[Route('/', name: 'fe_contests_index')]
     public function index(ContestRepository $contestRepository): Response
     {
         $contests = $contestRepository->allOpenContests();

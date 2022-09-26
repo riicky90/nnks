@@ -1,95 +1,94 @@
-{% include 'head.html.twig' %}
-<style>
-    .ts-wrapper.multi .ts-control [data-value] {
-        background-image: linear-gradient(to bottom, #087593, #178CAD);
-    }
+{% extends 'frontend/theme/base.html.twig' %}
 
-    .ts-wrapper.multi .ts-control [data-value].active {
-        background-image: linear-gradient(to bottom, #178CAD, #087593);
-    }
-</style>
+{% block title %}Registrations{% endblock %}
 
-<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 dark:bg-gray-900">
-    {% include '/frontend/theme/header.html.twig' %}
+{% block body %}
+    <div class="grid grid-cols-1 xl:grid-cols-3 xl:gap-4 px-4 pt-6">
+        <div class="col-span-full mb-4 xl:mb-2">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Inschrijving team bewerken</h1>
+        </div>
 
-    <main class="h-full overflow-y-auto">
-        <div class="container px-6 mx-auto p-10 grid">
-            <div class="my-10 bg-white p-5 rounded-md shadow-md">
-                <h1 class="my-2 text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                    Inschrijven wedstrijd {{ Contest.Name }}
-                </h1>
-
-                <p class="my-2 text-gray-600 dark:text-gray-400 mb-10">
-                    Hieronder kun je jouw team inschrijven voor de wedstrijd {{ Contest.Name }}. De inschrijfkosten voor
-                    de wedstrijd zijn <strong>€ {{ Contest.registrationFee }}</strong> euro.<br/>
-                    Per deelnemer betaal je <strong>€ {{ Contest.entranceFee }}</strong>. Betalen kan gelijk nadat je
-                    het team heb ingeschreven of achteraf.<br/>
-                    Elk team moet minimaal uit {{ craue_setting('minimum_num_dancers') }} dansers bestaan voordat de
-                    inschrijving compleet is.
-                    Houd er rekening mee dat de inschrijving
-                    over {{ Contest.date|date_modify(-craue_setting('days_before_reg_close')|default("0")~"day")|ago }}
-                    sluit.<br/>
-
-                <div class="w-1/2">
-                    {{ include('/frontend/registrations/_form.html.twig') }}
-                </div>
-
-                <!-- total price table -->
-                <div class="rounded-lg w-1/3 shadow-lg p-5 mt-8 mx-4 sm:mx-0 bg-white">
-                    <h1 class="text-gray-800 text-xl font-medium mb-2">Kostenoverzicht</h1>
-                    <p class="text-gray-600 text-xs">Datum: {{ "now"|date("d-m-Y") }}</p>
-                    <p class="text-gray-600 text-xs">Wedstrijd: {{ Contest.name }}</p>
-                    <hr class="my-4">
-                    <table class="table-auto w-full text-left">
-                        <thead>
-                        <tr>
-                            <th class="px-4 py-2">Item</th>
-                            <th class="px-4 py-2">Aantal</th>
-                            <th class="px-4 py-2">Prijs</th>
-                        </tr>
-                        </thead>
-                        <tbody id="total_price_table">
-                        <tr>
-                            <td class="px-4 py-2">Inschrijfgeld</td>
-                            <td class="px-4 py-2">1x</td>
-                            <td class="px-4 py-2">€ {{ Contest.registrationFee }}</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2">Deelnemerskosten</td>
-                            <td class="px-4 py-2"><span id="total_dancers">0</span>x</td>
-                            <td class="px-4 py-2">€ <span id="total_price_dancers">0.00</span></td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2"></td>
-                            <td class="px-4 py-2"></td>
-                            <td class="px-4 py-2">
-                                <hr class="my-4">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2 font-bold">Totaal bedrag</td>
-                            <td class="px-4 py-2 font-bold"></td>
-                            <td class="px-4 py-2 font-bold">€ <span id="total_price">0.00</span></td>
-                        </tr>
-                        </tbody>
-
-                    </table>
-                    <!-- pay now button -->
-                    <div class="flex justify-end mt-8">
-                        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                onclick="payNow()">
-                            Betalen
-                        </button>
-                    </div>
-
-                </div>
+        <div class="col-span-4">
+            <div class="mb-4 card">
+                <h3 class="text-xl font-bold mb-4">{{ registration.team.name|default('Nieuwe registratie') }}</h3>
+                {{ include('frontend/registrations/_form.html.twig') }}
+                <button id="save-button"
+                        class="mt-4 text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-5 py-4 text-center"
+                        type="submit">
+                    Opslaan
+                </button>
             </div>
 
-    </main>
-</div>
-<script>
-    //javascript on ready
-    document.addEventListener('DOMContentLoaded', function () {
+            <div id="cost-overview" class="mb-4 card">
+                <h3 class="text-xl font-bold mb-4">Kostenoverzicht</h3>
+                <div class="rounded-lg w-full shadow-lg p-5 mt-8 mx-4 sm:mx-0 bg-white">
+                    <hr class="my-4">
+                    <div class="overflow-x-auto">
+                        <div class="align-middle inline-block min-w-full">
+                            <div class="shadow overflow-hidden">
+                                <table class="table-auto w-full text-left">
+                                    <thead>
+                                    <tr>
+                                        <th class="px-4 py-2">Item</th>
+                                        <th class="px-4 py-2">Aantal</th>
+                                        <th class="px-4 py-2">Prijs</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="total_price_table">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2">Inschrijfgeld p.p.</td>
+                                        <td class="px-4 py-2"><span id="total_dancers">0</span>x</td>
+                                        <td class="px-4 py-2">€ {{ contest.registrationFee }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"></td>
+                                        <td class="px-4 py-2"></td>
+                                        <td class="px-4 py-2">
+                                            <hr class="my-4">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"></td>
+                                        <td class="px-4 py-2">Totaal bedrag</td>
+                                        <td class="px-4 py-2">€ <span id="grand_total">0.00</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2"></td>
+                                        <td class="px-4 py-2">Reeds betaald</td>
+                                        <td class="px-4 py-2">€ <span
+                                                    id="payed_total">{% if totalPayed is defined %}{{ totalPayed|number_format(2, '.', ',') }}{% else %} 0.00 {% endif %}</span>
+                                        </td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 font-bold"></td>
+                                        <td class="px-4 py-2 font-bold">Nog te voldoen</td>
+                                        <td class="px-4 py-2 font-bold">
+                                            <hr class="my-4">
+                                            € <span
+                                                    id="left_total">00,00</span></td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <!-- button aligned right -->
+                                <div class="flex justify-end">
+                                    <button id="pay-button"
+                                            class="mt-4 mr-4 text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-5 py-4 text-center"
+                                            type="submit">
+                                        Afrekenen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ include('/theme/_modal.html.twig') }}
+            </div>
+        </div>
+    </div>
+    <script>
         const targetNode = document.getElementById('registrations');
         const config = {attributes: true, childList: true, subtree: true};
 
@@ -100,16 +99,35 @@
         };
         const observer = new MutationObserver(callback);
         observer.observe(targetNode, config);
-    });
 
-    function calculateTotalPrice() {
-        let dancers_count = document.getElementsByClassName('item').length - 1;
-        let total = dancers_count * '{{ Contest.entranceFee }}';
-        let registration_fee = 1 * '{{ Contest.registrationFee }}';
+        function calculateTotalPrice() {
+            let dancers_count = document.getElementsByClassName("plugin-remove_button")[0].getElementsByClassName('item').length;
+            let total = dancers_count * '{{ contest.registrationFee }}';
+            let payed_total = document.getElementById('payed_total').innerText;
 
-        document.getElementById('total_dancers').innerHTML = dancers_count;
-        document.getElementById('total_price_dancers').innerHTML = total.toFixed(2);
-        document.getElementById('total_price').innerHTML = +(total + registration_fee);
-    }
+            if (payed_total >= total) {
+                document.getElementById('pay-button').style.display = 'none';
+                document.getElementById('cost-overview').style.display = 'none';
+                document.getElementById('save-button').style.display = 'block';
+            } else {
+                document.getElementById('pay-button').style.display = 'block';
+                document.getElementById('cost-overview').style.display = 'block';
+                document.getElementById('save-button').style.display = 'none';
+                document.getElementById('left_total').innerHTML = (total - payed_total).toFixed(2);
 
-</script>
+            }
+
+            document.getElementById('total_dancers').innerHTML = dancers_count;
+            document.getElementById('grand_total').innerHTML = total.toFixed(2);
+
+            document.getElementById('save-button').addEventListener('click', function () {
+                document.querySelectorAll('[name="registrations"]')[0].submit();
+            });
+
+            document.getElementById('pay-button').addEventListener('click', function () {
+                //redirect to payment page
+                window.location.href = '{{ path('make_payment', { team: contest. }) }}';
+            });
+        }
+    </script>
+{% endblock %}

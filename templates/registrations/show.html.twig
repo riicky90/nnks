@@ -3,7 +3,8 @@
 {% block title %}Registrations{% endblock %}
 
 {% block body %}
-    <div {{ stimulus_controller("modal-form") }} class="grid grid-cols-1 xl:grid-cols-3 xl:gap-4 px-4 pt-6">
+    <div {{ stimulus_controller("modal-form", {refreshAfterSubmit: true}) }}
+            class="grid grid-cols-1 xl:grid-cols-3 xl:gap-4 px-4 pt-6">
         <div class="col-span-full mb-4 xl:mb-2">
             <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Inschrijving details</h1>
         </div>
@@ -14,12 +15,11 @@
                     <div>
                         <div class="grid grid-flow-col">
                             <div><h2 class="text-xl font-bold">
-                                    Dansschool: {{ registration.Team.Organisation.Name }}</h2></div>
+                                    Dansschool: {{ registration.Team.User.DansSchool }}</h2></div>
                             <div>
-                                <span data-action="click->modal-form#open"
+                                <span title="Inschrijving aanpassen" data-action="click->modal-form#open"
                                       data-modal-form-title-param="Inschrijving bewerken"
-                                      data-modal-form-url-param="{{ path('registrations_edit', {id: registration.id}) }}"
-                                >
+                                      data-modal-form-url-param="{{ path('registrations_edit', {id: registration.id}) }}">
                                 <svg class="ml-6 w-5 h-5 text-gray-500 hover:underline hover:text-black cursor-pointer"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -29,21 +29,6 @@
                                     </span>
                             </div>
                         </div>
-                        <ul class="space-y-1 mt-2">
-                            <li class="text-sm font-normal text-gray-500 flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-gray-900" fill="none" stroke="currentColor"
-                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                {{ registration.Team.Organisation.Adres }}
-                            </li>
-                            <li class="text-sm font-normal text-gray-500 flex items-center ml-6">
-                                {{ registration.Team.Organisation.ZipCode }}, {{ registration.Team.Organisation.City }}
-                            </li>
-                        </ul>
                     </div>
                 </div>
                 <div class="sm:flex xl:block mb-4">
@@ -62,6 +47,11 @@
                             </div>
                             <span class="mt-4 bg-green-100 text-green-800 px-1 py-1 rounded-md mb-2 mr-2"> {{ registration.Team.Category.Name }}</span>
                             <div class="mt-4 font-bold">
+                                Naam van de trainer:
+                            </div>
+                            <span class="text-sm text-gray-900">
+                              {{ registration.Team.TrainerName }}</span>
+                            <div class="mt-4 font-bold">
                                 E-mail adres trainer:
                             </div>
                             <a class="text-sm text-gray-900 hover:underline"
@@ -77,16 +67,10 @@
                                 {{ registration.createdAt|date('d-m-Y H:i') }}
                             </div>
                             <div class="mt-4 font-bold">
-                                Telefoon nummer:
-                            </div>
-                            <div class="text-sm text-gray-900 mb-2">
-                                {{ registration.Team.Organisation.Phone }}
-                            </div>
-                            <div class="mt-4 font-bold">
                                 Opmerkingen bij inchrijving:
                             </div>
                             <div class="text-sm text-gray-900 mb-2">
-                                {{ registration.Comments|raw }}
+                                {{ registration.Comments|raw|default('-') }}
                             </div>
                         </address>
                     </div>
@@ -95,7 +79,38 @@
             {% if registration.MusicFile %}
                 <div class="mb-4 card">
                     <div>
-                        <h3 class="text-xl font-bold">Muziek</h3>
+                        <div class="grid grid-flow-col">
+                            <div>
+                                <h3 class="text-xl font-bold">Muziek</h3>
+                            </div>
+                            <div>
+                                <form class="inline-flex"
+                                      action="{{ path("registrations_removeMusic", {id: registration.id}) }}"
+                                      method="POST"
+                                        {{ stimulus_controller('submit-confirm',
+                                            {
+                                                title: 'Muziek verwijderen',
+                                                text: 'Weet u zeker dat u dit bestand wil verwijderen?',
+                                                confirmButtonText: 'Verwijderen',
+                                                icon: 'warning',
+                                                submitAsync: true,
+                                                refreshAfterSubmit: true,
+                                            }) }} data-action="submit-confirm#onSubmit">
+                                    <input type="hidden" name="_token"
+                                           value="{{ csrf_token('delete' ~ registration.id) }}"/>
+                                    <button title="Muziek verwijderen" type="submit"
+                                            class="text-gray-500 hover:text-gray-900 cursor-pointer p-1 hover:bg-gray-100 rounded inline-flex justify-center">
+                                        <svg class="w-5 h-5 text-gray-500 hover:underline hover:text-black cursor-pointer"
+                                             fill="currentColor" viewBox="0 0 20 20"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                                  clip-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                         <p class="mt-6">{{ registration.MusicFile }}</p>
                         <audio class="text-gray-500 mt-2 w-full" controls>
                             <source src="{{ asset('uploads/music/' ~ registration.MusicFile) }}" type="audio/mpeg">
@@ -207,16 +222,36 @@
                             <div class="align-middle inline-block min-w-full">
                                 <div class="shadow overflow-hidden sm:rounded-lg">
                                     <div class="flex items-center">
-                                        {% if registration.registrationStatus.status == true %}
-
-                                            <div class="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></div>
-                                            Registratie is compleet
-                                        {% else %}
-                                            <div class="h-2.5 w-2.5 rounded-full bg-red-400 mr-2"></div>
-                                            {{ registration.registrationStatus.reason|replace({' &#013;': '<br />'})|raw }}
-
-                                        {% endif %}
-
+                                        <ul>
+                                            {% set var = 0 %}
+                                            {% if totalDancers|number_format(2, ',', '.') > totalOrder|number_format(2, ',', '.') %}
+                                                {% set var = var + 1 %}
+                                                <li>
+                                                    <div class="h-2.5 w-2.5 rounded-full float-left bg-red-500 mr-2"></div>
+                                                    Volledig bedrag nog niet betaald
+                                                </li>
+                                            {% endif %}
+                                            {% if registration.musicFile is empty %}
+                                                {% set var = var + 1 %}
+                                                <li>
+                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 float-left mr-2"></div>
+                                                    Muziek is nog niet geupload
+                                                </li>
+                                            {% endif %}
+                                            {% if registration.numberOfDancers < craue_setting('minimum_num_dancers') %}
+                                                {% set var = var + 1 %}
+                                                <li>
+                                                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 float-left mr-2"></div>
+                                                    Er zijn nog niet genoeg dansers ingeschreven
+                                                    ({{ registration.numberOfDancers }} van
+                                                    de {{ craue_setting('minimum_num_dancers') }})
+                                                </li>
+                                            {% endif %}
+                                            {% if var == 0 %}
+                                                <div class="h-2.5 w-2.5 rounded-full bg-green-500 float-left mr-2"></div>
+                                                Inschrijving is compleet
+                                            {% endif %}
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

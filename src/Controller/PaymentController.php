@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Orders;
 use App\Entity\Organisation;
+use App\Repository\ContestRepository;
 use App\Repository\OrdersRepository;
 use App\Repository\OrganisationRepository;
 use App\Repository\RegistrationsRepository;
+use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +29,7 @@ class PaymentController extends AbstractController
         $this->mollie = new \Mollie\Api\MollieApiClient;
     }
 
-    #[Route('/paymentmethods')]
+    #[Route('/frontend/paymentmethods')]
     public function listPaymentOptions()
     {
         $payments = $this->mollie->payments->page();
@@ -35,40 +37,31 @@ class PaymentController extends AbstractController
         dd($payments);
     }
 
-    #[Route('/makepayment', methods: ['POST'], name: "make_payment")]
-    public function makePayment(Request $request, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager)
+    #[Route('/frontend/makepayment/{registration}/{amount}', name: "make_payment", methods: ['GET'])]
+    public function makePayment($registration, $amount, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager)
     {
-        $method = $request->get('method');
-        $amount = $request->get('amount');
-        $orderID = $request->get('orderid');
-        $registration = $request->get('registration');
+        $registration = $registrationsRepository->find($registration);
+        $amountFormatted = number_format($amount, 2, '.', ',');
 
-        $amountFormatted = number_format($amount, 2, '.', '');
+        $this->mollie->setApiKey($registration->getContest()->getOrganisation()->getMollieApiKey());
 
-        $reg = $registrationsRepository->find($registration);
-
-        $this->mollie->setApiKey($reg->getTeam()->getOrganisation()->getMollieApiKey());
 
         $payment = $this->mollie->payments->create([
             "amount" => [
                 "currency" => "EUR",
                 "value" => $amountFormatted
             ],
-            "description" => "Order #{$orderID}",
-            "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => $orderID], UrlGeneratorInterface::ABSOLUTE_URL),
-            "webhookUrl" => "",
-            "metadata" => [
-                "Registration" => $registration
-            ],
-
+            "description" => "Order #1234",
+            "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => "1234"], UrlGeneratorInterface::ABSOLUTE_URL),
+            "webhookUrl" => ""
         ]);
 
         $order = new Orders();
 
-        $order->SetOrderNumber($orderID);
-        $order->SetRegistration($reg);
         $order->setOrderStatus("pending");
+        $order->setOrderNumber("1234");
         $order->setAmount($amountFormatted);
+        $order->setRegistration($registrationsRepository->find($registration));
         $entityManager->persist($order);
         $entityManager->flush();
 
@@ -77,18 +70,18 @@ class PaymentController extends AbstractController
     }
 
     #[Route('frontend/payment/result/{orderid}', name: "payment_result")]
-    public function paymentSuccess(Request $request, $orderid, OrdersRepository $ordersRepository, EntityManagerInterface $entityManager)
+    public function paymentResult($orderid, OrdersRepository $ordersRepository, EntityManagerInterface $entityManager)
     {
         try {
             $this->mollie->setApiKey($this->getUser()->getOrganisation()->getMollieApiKey());
 
             $payment = $this->mollie->orders->get($orderid);
 
-            if($payment->status == "completed") {
+            if ($payment->status == "completed") {
                 $order = $ordersRepository->findOneBy(['OrderNumber' => $orderid]);
                 $order->setOrderStatus("payed");
                 $entityManager->flush();
-            }else{
+            } else {
                 $order = $ordersRepository->findOneBy(['OrderNumber' => $orderid]);
                 $order->setOrderStatus("failed");
                 $entityManager->flush();
@@ -97,7 +90,7 @@ class PaymentController extends AbstractController
             return $this->render('frontend/orders/status.html.twig', [
                 'payment' => $payment,
             ]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
             $error = [
                 "status" => "error",
@@ -108,7 +101,6 @@ class PaymentController extends AbstractController
                 'payment' => $error,
             ]);
         }
-
 
 
     }

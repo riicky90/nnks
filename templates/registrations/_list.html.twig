@@ -1,0 +1,178 @@
+<table class="table-fixed min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100">
+    <tr>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            #
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(registrations, 'Team', 't.Name') }} {% if registrations.isSorted('t.Name') %}
+                <svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>{% endif %}
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(registrations, 'Mail Trainer', 't.MailTrainer') }} {% if registrations.isSorted('t.MailTrainer') %}
+                <svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>{% endif %}
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(registrations, 'Wedstrijd', 'c.Name') }} {% if registrations.isSorted('c.Name') %}
+                <svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            {{ knp_pagination_sortable(registrations, 'Registratiedatum', 'r.createdAt') }} {% if registrations.isSorted('r.createdAt') %}
+                <svg class="w-4 h-4 float-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>{% endif %}
+
+        </th>
+        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+            Status
+        </th>
+        <th scope="col" class="p-4">
+        </th>
+    </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+    {% for registration in registrations %}
+        <tr data-action="modal-form:async:saved->reload-content#refreshContent submit-confirm:async:submitted->reload-content#refreshContent"
+            class="list-item-row hover:bg-gray-100">
+            <td class="p-4 w-4">
+                {{ registration.id }}
+            </td>
+            <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                <div class="text-base font-semibold text-gray-900"><a
+                            class="hover:underline"
+                            href="{{ path('registrations_show', { id: registration.id }) }}">{{ registration.Team.Name }}</a>
+                </div>
+            </td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900"><a
+                        class="hover:underline"
+                        href="mailto:{{ registration.Team.MailTrainer }}">{{ registration.Team.MailTrainer }}</a>
+            </td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.Contest.Name }}
+            </td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">
+                {{ registration.createdAt|date('d-m-Y H:i') }}
+            </td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">
+                <button title="Registratie niet compleet" id="warning-reg-{{ registration.id }}" type="button" data-dropdown-toggle="registration-dropdown-{{ registration.id }}"
+                        class="text-gray-500 hover:text-gray-900 hover:bg-gray-100 p-2 rounded-lg">
+                    <span class="sr-only">View notifications</span>
+                    <!-- Warning icon -->
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </button>
+                <!-- Dropdown menu -->
+                <div class="hidden bg-white text-base z-50 list-none divide-y divide-gray-100 rounded shadow-lg my-4 overflow-hidden z-20 max-w-sm"
+                     id="registration-dropdown-{{ registration.id }}">
+                    <div class="block bg-gray-50 text-gray-700 text-base text-center font-medium px-4 py-2">
+                        Registratie status
+                    </div>
+                    <div>
+                        <ul class="p-2">
+                            {% set count = 0 %}
+                            {% if registration.musicFile is empty %}
+                                {% set count = count +1 %}
+                                <li>
+                                    Muziek is nog niet geupload
+                                </li>
+                            {% endif %}
+                            {% if registration.numberOfDancers < craue_setting('minimum_num_dancers') %}
+                                {% set count = count +1 %}
+                                <li>
+                                    Er zijn nog niet genoeg dansers ingeschreven
+                                </li>
+                            {% endif %}
+                            {% if registrationPayed(registration.id) %}
+                                {% set count = count +1 %}
+                                <li>
+                                    Het volledige bedrag is nog niet betaald
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% if count < 1 %}
+                    <span title="Registratie is compleet">
+                                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
+                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        </span>
+                    <script>
+                        document.getElementById('warning-reg-{{ registration.id }}').style.display = 'none';
+                    </script>
+                {% endif %}
+            </td>
+            <td class="p-4 whitespace-nowrap space-x-2">
+                <button type="button" data-action="modal-form#open"
+                        data-modal-form-title-param="Inschrijving bewerken"
+                        data-modal-form-url-param="{{ path('registrations_edit', {id: registration.id}) }}"
+                        class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                    <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+                        <path fill-rule="evenodd"
+                              d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                    Bewerk inschrijving
+                </button>
+                <a target="_blank"
+                   href="{{ path('tickets_download', {registration: registration.id}) }}"
+                   title="Download tickets" type="button"
+                   class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </a>
+                <form class="inline-flex" action="{{ path('registrations_delete', {id: registration.id}) }}"
+                      method="POST"
+                        {{ stimulus_controller('submit-confirm',
+                            {
+                                title: 'Registratie verwijderen',
+                                text: 'Weet u zeker dat u deze registratie & geassocieerde orders wilt verwijderen?',
+                                confirmButtonText: 'Verwijderen',
+                                icon: 'warning',
+                                submitAsync: true
+                            }) }} data-action="submit-confirm#onSubmit">
+
+                    <input type="hidden" name="_token"
+                           value="{{ csrf_token('delete' ~ registration.id) }}"/>
+                    <button class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
+                        Verwijderen
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

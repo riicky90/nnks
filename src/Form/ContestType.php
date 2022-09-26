@@ -24,7 +24,9 @@ class ContestType extends AbstractType
             ->add('Location')
             ->add('Organisation')
             ->add('Description')
-            ->add('Enabled')
+            ->add('Enabled', null, [
+                'label' => 'Actief'
+            ])
             ->add('Disciplines')
             ->add('EntranceFee', null, [
                 'label' => 'Entree geld'

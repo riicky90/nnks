@@ -6,6 +6,7 @@ use App\Entity\Team;
 use App\Form\TeamType;
 use App\Repository\TeamRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,10 +17,27 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class TeamController extends AbstractController
 {
     #[Route('/', name: 'team_index', methods: ['GET'])]
-    public function index(TeamRepository $teamRepository): Response
+    public function index(Request $request, TeamRepository $teamRepository, PaginatorInterface $paginator): Response
     {
-        return $this->render('team/index.html.twig', [
-            'teams' => $teamRepository->findAll(),
+        $filter = $request->query->get('filter');
+        $reload = $request->query->get('reload');
+        $template = "team/index.html.twig";
+
+        $teams = $teamRepository->search($filter);
+
+        $pagination = $paginator->paginate(
+            $teams,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        if ($reload) {
+            $template = "team/_list.html.twig";
+        }
+
+        return $this->render($template, [
+            'teams' => $pagination,
+            'filter' => $filter
         ]);
     }
 

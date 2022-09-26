@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Contest;
+use Craue\ConfigBundle\Util\Config;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,8 +15,11 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContestRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $config;
+
+    public function __construct(ManagerRegistry $registry, Config $config)
     {
+        $this->config = $config;
         parent::__construct($registry, Contest::class);
     }
 
@@ -49,8 +53,10 @@ class ContestRepository extends ServiceEntityRepository
     public function search($search)
     {
         $qb = $this->createQueryBuilder('c');
-        $qb->where('c.Name LIKE :search OR c.Location LIKE :search OR c.Description LIKE :search OR c.Disciplines LIKE :search');
+        $qb->join('c.Organisation', 'o');
+        $qb->where('c.Name LIKE :search OR c.Location LIKE :search OR c.Description LIKE :search OR o.Name LIKE :search OR c.Disciplines LIKE :search');
         $qb->setParameter('search', '%'.$search.'%');
-        return $qb->getQuery()->getResult();
+        $qb->orderBy('c.id', 'DESC');
+        return $qb->getQuery();
     }
 }

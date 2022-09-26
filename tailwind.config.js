@@ -6,7 +6,6 @@ module.exports = {
     plugins: [
         require('flowbite/plugin')
     ],
-    darkMode: 'media', // or 'media' or 'class'
     theme: {
         extend: {
             fontFamily: {

@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 #[Route('/frontend/team')]
 class FeTeamController extends AbstractController
@@ -31,6 +32,8 @@ class FeTeamController extends AbstractController
 
         $teams = $teamRepository->searchPersonalTeam($userOrganisation, $q);
 
+
+
         $pagination = $paginator->paginate(
             $teams,
             $request->query->getInt('page', 1),
@@ -42,10 +45,6 @@ class FeTeamController extends AbstractController
         return $this->render('frontend/team/index.html.twig', [
             "teams" => $pagination,
             "contests" => $contests,
-            "organisation" => $userOrganisation,
-            "teams_count" => $teamRepository->totalPersonalTeams($userOrganisation),
-            "registrations_count" => $registrationsRepository->totalPersonalRegistrations($userOrganisation),
-            "personal_registrations" => $registrationsRepository->personalRegistrations($userOrganisation)
         ]);
     }
 
@@ -53,18 +52,20 @@ class FeTeamController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $team = new Team();
-        $form = $this->createForm(TeamType::class, $team, ['show_organisation' => false]);
+        $form = $this->createForm(TeamType::class, $team, [
+            'action' => $this->generateUrl('fe_team_new')
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $team->setOrganisation($this->getUser()->getOrganisation());
+
             $entityManager->persist($team);
             $entityManager->flush();
 
             return $this->redirectToRoute('fe_team_index');
         }
 
-        return $this->renderForm('frontend/team/new.html.twig', [
+        return $this->renderForm('frontend/team/_form.html.twig', [
             'team' => $team,
             'form' => $form,
         ]);
@@ -82,10 +83,10 @@ class FeTeamController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'fe_team_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Team $team, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Team $team, $id, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(TeamType::class, $team, [
-            'show_organisation' => false
+            'action' => $this->generateUrl('fe_team_edit', ['id' => $id])
         ]);
         $form->handleRequest($request);
 
@@ -95,7 +96,7 @@ class FeTeamController extends AbstractController
             return $this->redirectToRoute('fe_team_index');
         }
 
-        return $this->renderForm('/frontend/team/edit.html.twig', [
+        return $this->renderForm('/frontend/team/_form.html.twig', [
             'team' => $team,
             'form' => $form,
         ]);

@@ -10,7 +10,9 @@ use App\Repository\OrganisationRepository;
 use App\Repository\RegistrationsRepository;
 use App\Service\ContestComplete;
 use App\Service\FileUploader;
+use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,14 +22,26 @@ use Symfony\Component\Routing\Annotation\Route;
 class RegistrationsController extends AbstractController
 {
     #[Route('/', name: 'registrations_index', methods: ['GET'])]
-    public function index(RegistrationsRepository $registrationsRepository, Request $request): Response
+    public function index(RegistrationsRepository $registrationsRepository, Request $request, PaginatorInterface $paginator): Response
     {
         $filter = $request->query->get('filter');
+        $reload = $request->query->get('reload');
+        $template = "registrations/index.html.twig";
 
         $registrations = $registrationsRepository->search($filter);
 
-        return $this->render('registrations/index.html.twig', [
-            'registrations' => $registrations,
+        $pagination = $paginator->paginate(
+            $registrations,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        if ($reload) {
+            $template = "registrations/_list.html.twig";
+        }
+
+        return $this->render($template, [
+            'registrations' => $pagination,
             'filter' => $filter
         ]);
     }
@@ -36,12 +50,10 @@ class RegistrationsController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, FileUploader $fileUploader): Response
     {
         $registration = new Registrations();
-        $form = $this->createForm(RegistrationsType::class, $registration,
-            [
-                'action' => $this->generateUrl('registrations_new'),
-                'method' => 'POST',
-            ]
-        );
+        $form = $this->createForm(RegistrationsType::class, $registration, [
+            'action' => $this->generateUrl('registrations_new')
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -49,35 +61,34 @@ class RegistrationsController extends AbstractController
             $musicFile = $form->get('Music')->getData();
 
             if ($musicFile) {
-                $musicFileName = $fileUploader->upload($musicFile);
-                $registration->setMusicFile($musicFileName);
+                $fileName = $fileUploader->upload($musicFile);
+                $registration->setMusicFile($fileName);
             }
 
             $entityManager->persist($registration);
             $entityManager->flush();
 
-            return $this->redirectToRoute('registrations_index', [], Response::HTTP_SEE_OTHER);
-
+            return new Response(null, 204);
         }
 
         return $this->renderForm('registrations/_form.html.twig', [
             'registration' => $registration,
             'form' => $form,
-        ]);
+        ], new Response(null, $form->isSubmitted() ? 422 : 200));
     }
 
     #[Route('/{id}', name: 'registrations_show', methods: ['GET'])]
-    public function show(Registrations $registration, EntityManagerInterface $entityManager, RegistrationsRepository $registrationsRepository, $id, DancersRepository $dancersRepository, OrganisationRepository $organisation, OrdersRepository $orders): Response
+    public function show(Registrations $registration, $id, OrdersRepository $orders, Config $config): Response
     {
-        $repo = $entityManager->getRepository('Gedmo\Loggable\Entity\LogEntry');
-
         return $this->render('registrations/show.html.twig', [
             'registration' => $registration,
-            'totalDancers' => $registration->getDancers()->count() * 5.00,
+            'totalDancers' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
             'totalOrder' => $orders->createQueryBuilder('o')
                 ->select('SUM(o.Amount)')
-                ->where('o.Registration = :registration')
+                ->andWhere('o.Registration = :registration')
+                ->andWhere('o.OrderStatus = :payed')
                 ->setParameter('registration', $registration)
+                ->setParameter('payed', 'payed')
                 ->getQuery()
                 ->getSingleScalarResult(),
         ]);
@@ -86,40 +97,31 @@ class RegistrationsController extends AbstractController
     #[Route('/{id}/edit', name: 'registrations_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, $id, Registrations $registration, EntityManagerInterface $entityManager, FileUploader $fileUploader): Response
     {
-        $form = $this->createForm(RegistrationsType::class, $registration,
-            [
-                'action' => $this->generateUrl('registrations_edit', ['id' => $id]),
-                'method' => 'POST',
-            ]);
+        $form = $this->createForm(RegistrationsType::class, $registration, [
+            'action' => $this->generateUrl('registrations_edit', ['id' => $id]),
+        ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            try {
-                $musicFile = $form->get('Music')->getData();
+            $musicFile = $form->get('Music')->getData();
 
-                if ($musicFile) {
-                    $musicFileName = $fileUploader->upload($musicFile);
-                    $registration->setMusicFile($musicFileName);
-                }
-
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Inschrijving opgeslagen.');
-
-                return $this->redirect($request->headers->get('referer'));
-
-            } catch (\Exception $e) {
-                $this->addFlash('success', 'Inschrijving mislukt.<br /> ' . $e->getMessage());
-
+            if ($musicFile) {
+                $fileName = $fileUploader->upload($musicFile);
+                $registration->setMusicFile($fileName);
             }
+
+            $entityManager->persist($registration);
+            $entityManager->flush();
+
+            return new Response(null, 204);
         }
 
         return $this->renderForm('registrations/_form.html.twig', [
             'registration' => $registration,
             'form' => $form,
-        ]);
+        ], new Response(null, $form->isSubmitted() ? 422 : 200));
     }
 
     #[Route('/{id}', name: 'registrations_delete', methods: ['POST'])]
@@ -131,6 +133,28 @@ class RegistrationsController extends AbstractController
         }
 
         return $this->redirectToRoute('registrations_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/removeMusic', name: 'registrations_removeMusic', methods: ['POST'])]
+    public function removeMusic(Request $request, Registrations $registration, EntityManagerInterface $entityManager, FileUploader $fileUploader): Response
+    {
+        $referer = $request->headers->get('referer');
+
+        $fileUploader->removeFile($registration->getMusicFile());
+
+        if ($this->isCsrfTokenValid('delete' . $registration->getId(), $request->request->get('_token'))) {
+            $registration->setMusicFile("");
+            $entityManager->persist($registration);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Muziek bestand is verwijderd');
+        }else{
+            $this->addFlash('error', 'Muziek bestand kon niet verwijderd worden');
+        }
+
+
+
+        return $this->redirect($referer);
     }
 
 }

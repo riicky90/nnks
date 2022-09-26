@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Blameable\Traits\BlameableEntity;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -36,12 +38,13 @@ class Team
     #[ORM\OneToMany(mappedBy: 'Team', targetEntity: Registrations::class,  fetch: 'EAGER')]
     private $registrations;
 
-    #[ORM\ManyToOne(targetEntity: Organisation::class, inversedBy: 'teams', fetch: 'EAGER')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $Organisation;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $TrainerName;
+
+    #[ORM\ManyToOne(inversedBy: 'teams')]
+    #[Gedmo\Blameable(on: 'create')]
+    private ?User $User = null;
 
     public function __construct()
     {
@@ -50,7 +53,7 @@ class Team
     }
 
     public function __toString() {
-        return $this->Name .' - '. $this->Organisation;
+        return $this->Name;
     }
 
     public function getId(): ?int
@@ -166,18 +169,6 @@ class Team
         return $this;
     }
 
-    public function getOrganisation(): ?Organisation
-    {
-        return $this->Organisation;
-    }
-
-    public function setOrganisation(?Organisation $Organisation): self
-    {
-        $this->Organisation = $Organisation;
-
-        return $this;
-    }
-
     public function getTrainerName(): ?string
     {
         return $this->TrainerName;
@@ -186,6 +177,18 @@ class Team
     public function setTrainerName(string $TrainerName): self
     {
         $this->TrainerName = $TrainerName;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): self
+    {
+        $this->User = $User;
 
         return $this;
     }

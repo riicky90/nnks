@@ -24,6 +24,6 @@ class OrganisationRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('o');
         $qb->where('o.Name LIKE :search OR o.City LIKE :search OR o.Email LIKE :search OR o.Phone LIKE :search');
         $qb->setParameter('search', '%'.$search.'%');
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery();
     }
 }

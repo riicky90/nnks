@@ -39,5 +39,19 @@ class EventScanRepository extends ServiceEntityRepository
         }
     }
 
+    public function search($search)
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->leftJoin('e.Dancer', 'd');
+        $qb->leftJoin('d.team', 't');
+        $qb->leftJoin('e.Contest', 'c');
+        $qb->leftJoin('e.ScannedBy', 'u');
+
+
+        $qb->where('t.Name LIKE :search OR c.Name LIKE :search OR u.email LIKE :search');
+        $qb->setParameter('search', '%'.$search.'%');
+        return $qb->getQuery();
+    }
+
 
 }

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+{% include '/frontend/theme/head.html.twig' %}
+    <body class="bg-gray-50 ">
+    {% include '/frontend/theme/parts/topbar.html.twig' %}
+    {% include '/frontend/theme/parts/sidebar.html.twig' %}
+
+    <div id="main-content" class="h-full relative overflow-y-auto pt-16 lg:ml-64">
+        <main>
+        {% block body %}
+
+
+        {% endblock %}
+        </main>
+    </div>
+    {% if error is defined %}
+        {{ include('/theme/_alert.html.twig') }}
+    {% endif %}
+    {% for message in app.flashes('success') %}
+            {{ include('/theme/_alert.html.twig', {message: message}) }}
+        </div>
+    {% endfor %}
+    {% if error is defined %}
+        {{ include('/theme/_alert.html.twig', {type: "error", message: error.message}) }}
+    {% endif %}
+
+    </body>
+</html>

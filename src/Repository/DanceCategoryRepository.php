@@ -47,4 +47,17 @@ class DanceCategoryRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    //search
+    public function search($query)
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        if ($query) {
+            $qb->andWhere('c.Name LIKE :val')
+                ->setParameter('val', '%'.$query.'%');
+        }
+
+        return $qb->getQuery();
+    }
 }

@@ -1,3 +1,4 @@
+{# TODO: let each dancer have its own page with qr and details #}
 <head>
     <title>Ticket {{ registration.Team.Name }}</title>
     <style>
@@ -39,7 +40,6 @@
         }
 
         .fl-table td {
-            border-right: 1px solid #f8f8f8;
             font-size: 18px;
         }
 
@@ -47,23 +47,13 @@
             color: #fff;
             background: #178CAD;
         }
-
-        .fl-table thead th:nth-child(odd) {
-            color: #ffffff;
-        }
-
-        .fl-table tr:nth-child(even) {
-            background: #F8F8F8;
-        }
-
     </style>
 </head>
 
 {% block body %}
-    <img width="100" src="http://localhost:8000/images/nnks-logo.jpg">
     <h1>NNKS Tickets team: {{ registration.Team.Name }}</h1>
-    {% set value = registration.Team.Organisation %}
-    <h3>Ogranisatie: {{ value.Name }}</h3>
+    {% set value = registration.Team.User %}
+    <h3>Dansschool: {{ value.Dansschool }}</h3>
 
     <ul style="list-style: none; padding-left: 0;">
         <h4 style="margin-bottom: 0px;">{{ registration.Contest.Name }}</h4>
@@ -72,9 +62,9 @@
         <li></li>
     </ul>
 
-    <h3>Trainer: </h3>
+    <h3>Trainer: {{ registration.Team.TrainerName }}</h3>
     <div class="table-wrapper">
-        <table class="fl-table">
+        <table class="fl-table" style="border:none;">
             <thead>
             <tr>
                 <th>Naam + Achternaam</th>
@@ -84,12 +74,13 @@
             </thead>
             <tbody>
             {% for dancer in dancers %}
-                <tr>
-                    <td>{{ dancer.Firstname }} {{ dancer.SecondName }} {{ dancer.LastName }}</td>
+                <tr style="padding-top: 600px; padding-bottom: 600px">
+                    <td>{{ dancer.Firstname }} {{ dancer.SecondName }} {{ dancer.LastName }} </td>
                     <td>{{ dancer.BirthDay|date('d-m-Y') }}</td>
-                    <td><img width="100" src="{{ qr_code_data_uri(dancer.Id) }}"/>
+                    <td><img width="200" src="{{ qr_code_data_uri(url('eventscan_scan', {contest: registration.contest.id, dancer: dancer.id})) }}"/>
                     </td>
                 </tr>
+
             {% endfor %}
             <tbody>
         </table>

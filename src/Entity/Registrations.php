@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Craue\ConfigBundle\Util\Config;
 
 #[ORM\Entity(repositoryClass: RegistrationsRepository::class)]
 #[Gedmo\Loggable]
@@ -38,7 +39,7 @@ class Registrations
     #[ORM\JoinColumn(nullable: false)]
     private $Contest;
 
-    #[ORM\OneToMany(mappedBy: 'Registration', targetEntity: Orders::class)]
+    #[ORM\OneToMany(mappedBy: 'Registration', targetEntity: Orders::class, cascade: ['remove'], orphanRemoval: true)]
     private $orders;
 
     #[Gedmo\Versioned]
@@ -169,7 +170,12 @@ class Registrations
         return $this;
     }
 
-    public function getRegistrationStatus()
+    public function getNumberOfDancers(): int
+    {
+        return count($this->Dancers);
+    }
+
+    public function getTotalPayed()
     {
         $orders = $this->getOrders();
 
@@ -181,36 +187,7 @@ class Registrations
             }
         }
 
-        $dancers = $this->getDancers();
-        $music = $this->getMusicFile();
-
-        $totalDue = count($dancers) * 5.00;
-
-        if (count($dancers) >= 4 && $music && $totalPayed >= $totalDue) {
-            return [
-                'status' => true,
-                'reason' => ['Registration is complete']
-            ];
-        } else {
-
-            $reason = "";
-            //check if requirements are met
-            if (count($dancers) <= 4) {
-                $reason .= "Aantal dansers is minder dan 5 &#013;";
-            }if(count($dancers) == 0) {
-                $reason .= "Er zijn nog geen dansers ingegeven &#013;";
-            }if (!$music) {
-                $reason .= "Er is nog geen muziek geupload &#013;";
-            }
-            if ($totalPayed < $totalDue) {
-                $reason .= "Het volledige bedrag is nog niet betaald &#013;";
-            }
-
-            return [
-                'status' => false,
-                'reason' => $reason
-            ];
-        }
+        return $totalPayed;
     }
 
     public function getCreatedBy(): ?User

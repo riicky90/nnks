@@ -21,7 +21,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
     public function handle(Request $request, AccessDeniedException $accessDeniedException): RedirectResponse
     {
         // add a custom flash message and redirect to the login page
-        $request->getSession()->getFlashBag()->add('success', 'Geen toegang');
+        $request->getSession()->getFlashBag()->add('warning', 'Geen toegang');
 
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }

@@ -1,82 +1,146 @@
-{% include 'head.html.twig' %}
+{% extends '/frontend/theme/base.html.twig' %}
 
-<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 dark:bg-gray-900">
-    {% include '/frontend/theme/header.html.twig' %}
-
-    <main class="h-full overflow-y-auto">
-        <div class="container px-6 mx-auto grid">
-            <div class="my-10 bg-white p-5 rounded-md shadow-md">
-                <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
-                    Inschrijvingen
-                </h3>
-
-                <table class="table-fixed min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                    <tr>
-                        <th scope="col" class="p-4">
-                            <div class="flex items-center">
-                                <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
-                                       class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
-                                <label for="checkbox-all" class="sr-only">checkbox</label>
-                            </div>
-                        </th>
-                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                            Wedstrijd
-                        </th>
-                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                            Team
-                        </th>
-                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                            Aantal dansers
-                        </th>
-                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                            Registratiedatum
-                        </th>
-                        <th scope="col" class="p-4">
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    {% for registration in registrations %}
-                        <tr class="hover:bg-gray-100">
-                            <td class="p-4 w-4">
-                                <div class="flex items-center">
-                                    <input id="checkbox" aria-describedby="checkbox-1" type="checkbox"
-                                           class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
-                                    <label for="checkbox" class="sr-only">checkbox</label>
-                                </div>
-                            </td>
-                            <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
-                                <div class="text-base font-semibold text-gray-900">{{ registration.contest.name }}</div>
-                            </td>
-                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.team.name }}</td>
-                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.dancers|length }}</td>
-                            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.createdAt|date('d-m-Y H:i:m') }}</td>
-                            <td class="p-4 whitespace-nowrap space-x-2">
-                                {% if registration.registrationStatus.status == true %}
-                                    <span class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:green-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">Registratie is afgerond!</span>
-                                {% else %}
-                                     <a href="{{ path('fe_registration_edit',{id: registration.Id}) }}" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:red-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">Registratie afronden</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {{ knp_pagination_render(registrations) }}
-
-                {% if registrations is empty %}
-                <!-- warning h3 tailwind -->
-                <div class="mt-4 items-center justify-center h-full">
-                    <h3 class="text-red-500 text-center text-xl">
-                        Er zijn geen inschrijvingen gevonden.
+{% block body %}
+    <div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 ">
+        <main class="h-full w-full overflow-y-auto">
+            <div class="container px-6 mx-auto grid">
+                <div class="my-10 bg-white p-5 rounded-md shadow-md">
+                    <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
+                        Inschrijvingen
                     </h3>
-                    {% endif %}
+
+                    <table class="table-fixed min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                #
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Wedstrijd
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Team
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Status
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Registratiedatum
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        {% for registration in registrations %}
+                            <tr class="hover:bg-gray-100">
+                                <td class="px-3 py-4 whitespace-nowrap">
+                                    {{ registration.id }}
+                                </td>
+                                <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                                    <div class="text-base font-semibold text-gray-900">{{ registration.contest.name }}</div>
+                                </td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.team.name }}</td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">
+                                    <div id="warning-reg">
+                                        <button type="button" data-dropdown-toggle="registration-dropdown"
+                                                class="text-gray-500 hover:text-gray-900 hover:bg-gray-100 p-2 rounded-lg">
+                                            <span class="sr-only">View notifications</span>
+                                            <!-- Warning icon -->
+                                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor"
+                                                 viewBox="0 0 24 24"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                            </svg>
+                                        </button>
+                                        <!-- Dropdown menu -->
+                                        <div class="hidden bg-white text-base z-50 list-none divide-y divide-gray-100 rounded shadow-lg my-4 overflow-hidden z-20 max-w-sm"
+                                             id="registration-dropdown">
+                                            <div class="block bg-gray-50 text-gray-700 text-base text-center font-medium px-4 py-2">
+                                                Registratie status
+                                            </div>
+                                            <div>
+                                                <ul class="p-2">
+                                                    {% set count = 0 %}
+                                                    {% if registration.musicFile is empty %}
+                                                        {% set count = count +1 %}
+                                                        <li>
+                                                            Muziek is nog niet geupload
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if registration.numberOfDancers < craue_setting('minimum_num_dancers') %}
+                                                        {% set count = count +1 %}
+                                                        <li>
+                                                            Er zijn nog niet genoeg dansers ingeschreven
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if registrationPayed(registration.id) %}
+                                                        {% set count = count +1 %}
+                                                        <li>
+                                                            Het volledige bedrag is nog niet betaald
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if count < 1 %}
+                                        <span title="Registratie is compleet">
+                                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
+                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        </span>
+                                        <script>
+                                            document.getElementById('warning-reg').style.display = 'none';
+                                        </script>
+                                    {% endif %}
+                                </td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ registration.createdAt|date('d-m-Y H:i:m') }}</td>
+                                <td class="p-4 whitespace-nowrap space-x-2">
+                                    {% if count < 1 %}
+                                        <form class="inline-flex"
+                                              action="{{ path("fe_registration_edit", {id: registration.id}) }}"
+                                              method="GET"
+                                                {{ stimulus_controller('submit-confirm',
+                                                    {
+                                                        title: 'Inschrijving bewewerken',
+                                                        text: 'Deze inschrijving is compleet. Weet u zeker dat u deze wil bewerken?',
+                                                        confirmButtonText: 'Ja',
+                                                        icon: 'warning',
+                                                        submitAsync: false
+                                                    }) }} data-action="submit-confirm#onSubmit">
+                                            <button title="Inschrijving bewerken" type="submit">
+                                                <svg class="w-6 h-6 text-gray-500 hover:text-gray-900 transition duration-75"
+                                                     fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          stroke-width="2"
+                                                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <a href="{{ path('fe_registration_edit', { id: registration.id }) }}" class="rounded bg-green-400 hover:bg-green-500 text-white p-2">Registratie afronden</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {{ knp_pagination_render(registrations) }}
+
+                    {% if registrations is empty %}
+                    <!-- warning h3 tailwind -->
+                    <div class="mt-4 items-center justify-center h-full">
+                        <h3 class="text-center text-xl">
+                            Er zijn geen inschrijvingen gevonden.
+                        </h3>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-
-    </main>
-</div>
-</div>
-
-</body>
+        </main>
+    </div>
+{% endblock %}

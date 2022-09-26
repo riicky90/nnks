@@ -31,6 +31,17 @@ class FileUploader
         return $fileName;
     }
 
+    public function removeFile($fileName)
+    {
+        if (file_exists($this->getTargetDirectory().'/'.$fileName)) {
+            try {
+                unlink($this->getTargetDirectory() . '/' . $fileName);
+            } catch (FileException $e) {
+                return false;
+            }
+        }
+    }
+
     public function getTargetDirectory()
     {
         return $this->targetDirectory;

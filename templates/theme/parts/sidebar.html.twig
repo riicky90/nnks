@@ -1,7 +1,7 @@
 {% set currentPath = path(app.request.attributes.get('_route'),
     app.request.attributes.get('_route_params')) %}
 <aside id="sidebar"
-       class="fixed hidden z-20 h-full top-0 left-0 pt-16 flex lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75"
+       class="fixed hidden z-20 h-full top-0 left-0 pt-16 flex lg:flex flex-shrink-0 flex-col lg:w-64 transition-width duration-75"
        aria-label="Sidebar">
     <div class="relative flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white pt-0">
         <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -68,8 +68,6 @@
                                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                             <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Inschrijvingen</span>
-                            <span class="bg-red-100 text-red-800 ml-3 text-xs font-medium inline-flex items-center justify-center h-5 w-5 p-3 rounded-full"
-                                  sidebar-toggle-item>{{ 0|registrationsCount }}</span>
                         </a>
                     </li>
                     <li>
@@ -90,7 +88,8 @@
                                       clip-rule="evenodd"></path>
                             </svg>
                         </button>
-                        <ul id="dropdown-pages" class="space-y-2 py-2 {% if currentPath == path('team_index') or currentPath == path('dance_category_index') %}{% else %}hidden{% endif %}">
+                        <ul id="dropdown-pages"
+                            class="space-y-2 py-2 {% if currentPath == path('team_index') or currentPath == path('dance_category_index') %}{% else %}hidden{% endif %}">
                             <li>
                                 <a href="{{ path('team_index') }}"
                                    class="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 {% if currentPath == path('team_index') %}bg-gray-100{% endif %}">Teams</a>
@@ -117,52 +116,59 @@
                                       clip-rule="evenodd"></path>
                             </svg>
                         </button>
-                        <ul id="dropdown-users" class="space-y-2 py-2 {% if currentPath == path('user_index') %}{% else %}hidden{% endif %}">
+                        <ul id="dropdown-users"
+                            class="space-y-2 py-2 {% if currentPath == path('user_index') %}{% else %}hidden{% endif %}">
                             <li>
                                 <a href="{{ path('user_index') }}"
                                    class="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 {% if currentPath == path('user_index') %}bg-gray-100{% endif %}">Alle
                                     gebruikers</a>
                             </li>
-                 {#           <li>
-                                <a href="#"
-                                   class="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11">Profile</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                   class="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11">Settings</a>
-                            </li>#}
                         </ul>
                     </li>
                     <div class="mt-10 pt-2 border-t-2">
                         <li>
                             <a href="{{ path('settings_index') }}"
                                class="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group {% if currentPath == path('settings_index') %}bg-gray-100{% endif %}">
-                                <svg class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <svg class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
                                 <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Instellingen</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ path('eventscan_index') }}"
                                class="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group {% if currentPath == path('eventscan_index') %}bg-gray-100{% endif %}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>                                <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Event check-in</span>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Event check-in</span>
                             </a>
                         </li>
-                    <li>
-                        <a href="{{ path('app_logout') }}"
-                           class="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group">
+                        <li>
+                            <a href="{{ path('app_logout') }}"
+                               class="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group">
 
 
-                            <svg class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Uitloggen</span>
-                        </a>
-                    </li>
+                                <svg class="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                <span class="ml-3 flex-1 whitespace-nowrap" sidebar-toggle-item>Uitloggen</span>
+                            </a>
+                        </li>
+                    </div>
                 </ul>
             </div>
-            </div>
         </div>
-        
     </div>
 </aside>
 

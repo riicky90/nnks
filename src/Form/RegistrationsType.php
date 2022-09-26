@@ -25,14 +25,12 @@ use Symfony\UX\Dropzone\Form\DropzoneType;
 class RegistrationsType extends AbstractType
 {
     private $token;
-    private $organisation;
     private $em;
     private $security;
 
-    public function __construct(TokenStorageInterface $token, OrganisationRepository $organisationRepo, EntityManagerInterface $em, Security $security)
+    public function __construct(TokenStorageInterface $token, EntityManagerInterface $em, Security $security)
     {
         $this->token = $token;
-        $this->organisation = $organisationRepo->find($this->token->getToken()->getUser()->getOrganisation());
         $this->em = $em;
         $this->security = $security;
     }
@@ -65,6 +63,9 @@ class RegistrationsType extends AbstractType
         $builder
             ->add('Music', DropzoneType::class, [
                 'label' => 'Muziek bestand',
+                'attr' => [
+                    'placeholder' => 'Selecteer of drop hier je muziekbestand (.mp3 of .wav)',
+                ],
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -92,7 +93,8 @@ class RegistrationsType extends AbstractType
             'data_class' => Registrations::class,
             'register' => false,
             'current_id' => null,
-            'contest' => null
+            'contest' => null,
+            'edit' => false,
         ]);
     }
 
@@ -124,8 +126,8 @@ class RegistrationsType extends AbstractType
                         )
 
                     );
-                    $qb->andWhere('t.Organisation = :organisation');
-                    $qb->setParameter('organisation', $this->security->getUser()->getOrganisation());
+                    $qb->andWhere('t.User = :user');
+                    $qb->setParameter('user', $this->security->getUser());
                     $qb->setParameter('contest', $options['contest']);
                 }
                 return $qb;

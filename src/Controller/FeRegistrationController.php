@@ -8,6 +8,7 @@ use App\Form\ContestType;
 use App\Form\RegistrationsType;
 use App\Repository\ContestRepository;
 use App\Repository\DancersRepository;
+use App\Repository\OrdersRepository;
 use App\Repository\RegistrationsRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
@@ -23,11 +24,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class FeRegistrationController extends AbstractController
 {
     #[Route('/', name: 'fe_registrations_index')]
-    public function registrations(RegistrationsRepository $registrationsRepository, Request $request, PaginatorInterface $paginator, UserRepository $userRepository, DancersRepository $dancersRepository): Response
+    public function registrations(RegistrationsRepository $registrationsRepository, Request $request, PaginatorInterface $paginator): Response
     {
-        $userOrganisation = $userRepository->find($this->getUser())->getOrganisation();
 
-        $registrations = $registrationsRepository->personalRegistrations($userOrganisation);
+        $registrations = $registrationsRepository->findBy(['CreatedBy' => $this->getUser()]);
 
         $pagination = $paginator->paginate(
             $registrations,
@@ -40,55 +40,78 @@ class FeRegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/register', name: 'fe_registration_register')]
-    public function register(Request $request, ContestRepository $contestRepository, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
+    #[Route('/register/contest/{contest}', name: 'fe_registration_register')]
+    public function register(Request $request, $contest, ContestRepository $contestRepository, FileUploader $fileUploader, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
     {
-        $contest = $contestRepository->find($request->get('contest'));
+        $contest = $contestRepository->find($contest);
 
         $registrations = new Registrations();
         $form = $this->createForm(RegistrationsType::class, $registrations,
             [
                 'register' => true,
-                'contest' => $contest
+                'contest' => $contest,
+                'action' => $this->generateUrl('fe_registration_register', ['contest' => $contest->getId()]),
             ]
         );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $dancers = $form->get('Dancers')->getData();
+
+            try {
+                $musicFile = $form->get('Music')->getData();
+
+                if ($musicFile) {
+                    $musicFileName = $fileUploader->upload($musicFile);
+                    $registrations->setMusicFile($musicFileName);
+                }
+
+            } catch (\Exception $e) {
+                $this->addFlash('success', 'Inschrijving mislukt.<br /> ' . $e->getMessage());
+            }
+
+            $amount = count($dancers) * $contest->getRegistrationFee();
+
             $registrations->setContest($contest);
             $entityManager->persist($registrations);
             $entityManager->flush();
 
-            return $this->forward('App\Controller\PaymentController::makePayment', [
-                'method' => 'ideal',
-                'amount' => 0.50,
-                'orderid' => $registrations->getId(),
-                'registration' => $registrations
-            ]);
+            return $this->redirectToRoute("make_payment",
+                [
+                    "registration" => $registrations->getId(),
+                    "contest" => $contest->getId(),
+                    "amount" => $amount
+                ]);
         }
 
         return $this->render('frontend/registrations/new.html.twig', [
-            'registrations' => $registrations,
-            'Contest' => $contest,
+            'contest' => $contest,
             'form' => $form->createView(),
         ]);
     }
 
     #[Route('/register/edit/{id}', name: 'fe_registration_edit')]
-    public function edit(Request $request, Registrations $registration, EntityManagerInterface $entityManager, FileUploader $fileUploader, ContestRepository $contestRepository): Response
+    public function edit(Request $request, Registrations $registration, EntityManagerInterface $entityManager, FileUploader $fileUploader, OrdersRepository $ordersRepository, ContestRepository $contestRepository): Response
     {
+        $orders = $ordersRepository->findBy(['Registration' => $registration->getId(), 'OrderStatus' => 'payed']);
+
         $form = $this->createForm(RegistrationsType::class, $registration,
             [
                 'register' => true,
+                'edit' => false,
+                'action' => $this->generateUrl('fe_registration_edit', ['id' => $registration->getId()]),
             ]);
 
         $contest = $contestRepository->find($registration->getContest()->getId());
-
+        $team = $registration->getTeam();
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $dancers = $form->get('Dancers')->getData();
+
+            $registration->setTeam($team);
 
             try {
                 $musicFile = $form->get('Music')->getData();
@@ -98,22 +121,32 @@ class FeRegistrationController extends AbstractController
                     $registration->setMusicFile($musicFileName);
                 }
 
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Inschrijving opgeslagen.');
-
-                return $this->redirect($request->headers->get('referer'));
-
             } catch (\Exception $e) {
                 $this->addFlash('success', 'Inschrijving mislukt.<br /> ' . $e->getMessage());
-
             }
+
+            $amount = count($dancers) * $contest->getRegistrationFee();
+
+            $registration->setContest($contest);
+            $entityManager->persist($registration);
+            $entityManager->flush();
+
+            return $this->redirectToRoute("fe_registrations_index");
         }
 
-        return $this->renderForm('frontend/registrations/new.html.twig', [
+        $total = 0;
+        foreach ($orders as $order) {
+            $total += $order->getAmount();
+        }
+
+        $form->remove('Team');
+
+        return $this->renderForm('frontend/registrations/edit.html.twig', [
             'registration' => $registration,
             'Contest' => $contest,
             'form' => $form,
+            'orderTotal' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
+            'totalPayed' => $total,
         ]);
     }
 }

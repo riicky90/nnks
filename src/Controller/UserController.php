@@ -7,6 +7,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +18,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     #[Route('/', name: 'user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function index(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
     {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+        $filter = $request->query->get('filter');
+        $reload = $request->query->get('reload');
+        $template = "user/index.html.twig";
+
+        $users = $userRepository->search($filter);
+
+        $pagination = $paginator->paginate(
+            $users,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        if ($reload) {
+            $template = "user/_list.html.twig";
+        }
+
+        return $this->render($template, [
+            'users' => $pagination,
+            'filter' => $filter
         ]);
     }
 
@@ -41,7 +59,7 @@ class UserController extends AbstractController
 
             $password = $passwordHasher->hashPassword(
                 $user,
-                $form->get('password')->getData()
+                $form->get('plainPassword')->getData()
             );
 
             $user->setPassword($password);

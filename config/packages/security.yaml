@@ -29,6 +29,9 @@ security:
       form_login:
         always_use_default_target_path: false
       access_denied_handler: App\Security\AccessDeniedHandler
+      remember_me:
+        secret: '%kernel.secret%'
+        lifetime: 604800 # 1 week in seconds
 
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
@@ -40,6 +43,7 @@ security:
       - { path: ^/logout, roles: PUBLIC_ACCESS }
       - { path: ^/register, roles: PUBLIC_ACCESS }
       - { path: ^/frontend, roles: ROLE_USER }
+      - { path: ^/makepayment, roles: ROLE_USER }
       - { path: ^/, roles: ROLE_ADMIN }
 when@test:
   security:

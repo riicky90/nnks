@@ -42,9 +42,6 @@ class Organisation
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $MollieApiKey;
 
-    #[ORM\OneToMany(mappedBy: 'Organisation', targetEntity: Team::class)]
-    private $teams;
-
     #[ORM\Column(type: 'text', nullable: true)]
     private $Description;
 
@@ -52,7 +49,6 @@ class Organisation
     {
         $this->contests = new ArrayCollection();
         $this->users = new ArrayCollection();
-        $this->teams = new ArrayCollection();
     }
 
     public function __toString()
@@ -205,36 +201,6 @@ class Organisation
     public function setMollieApiKey(?string $MollieApiKey): self
     {
         $this->MollieApiKey = $MollieApiKey;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Team[]
-     */
-    public function getTeams(): Collection
-    {
-        return $this->teams;
-    }
-
-    public function addTeam(Team $team): self
-    {
-        if (!$this->teams->contains($team)) {
-            $this->teams[] = $team;
-            $team->setOrganisation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTeam(Team $team): self
-    {
-        if ($this->teams->removeElement($team)) {
-            // set the owning side to null (unless already changed)
-            if ($team->getOrganisation() === $this) {
-                $team->setOrganisation(null);
-            }
-        }
 
         return $this;
     }

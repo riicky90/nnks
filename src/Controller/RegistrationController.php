@@ -40,9 +40,6 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
-
-            $user->setOrganisation($form->get('Organisation')->getData());
 
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
@@ -62,7 +59,6 @@ class RegistrationController extends AbstractController
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
-            // do anything else you need here, like send an email
 
             $this->addFlash('success', 'Je account is aangemaakt, controleer je email voor de verificatie.');
 

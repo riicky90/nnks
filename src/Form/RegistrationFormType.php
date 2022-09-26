@@ -20,13 +20,9 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email')
-            ->add('Organisation', EntityType::class, [
-                'class' => Organisation::class,
-                'choice_label' => 'Name',
-                'mapped' => false,
-                'multiple' => false,
-                'expanded' => false,
-                'label' => 'Organisatie',
+            ->add('DansSchool', null, [
+                'label' => 'Dansschool',
+                'required' => true,
             ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,

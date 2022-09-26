@@ -14,16 +14,6 @@ class TeamType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
-        if($options['show_organisation']) {
-            $builder
-                ->add('Organisation', EntityType::class, [
-                    'class' => 'App\Entity\Organisation',
-                    'choice_label' => 'Name',
-                    'placeholder' => 'Selecteer een organisatie',
-                    'required' => true
-                ]);
-        }
         $builder
             ->add('Name')
             ->add('TrainerName')
@@ -43,7 +33,6 @@ class TeamType extends AbstractType
 
         $resolver->setDefaults([
             'data_class' => Team::class,
-            'show_organisation' => true
         ]);
     }
 }

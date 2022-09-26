@@ -1,83 +1,89 @@
-{% include 'head.html.twig' %}
+{% extends '/frontend/theme/base.html.twig' %}
 
-<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 dark:bg-gray-900">
-    {% include '/frontend/theme/header.html.twig' %}
-
-    <main class="h-full overflow-y-auto">
-        <div class="container px-6 mx-auto grid">
-            <div class="my-10 bg-white p-5 rounded-md shadow-md">
-            <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
-               Wedstrijden
-            </h3>
-
-            <table class="table-fixed min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                <tr>
-                    <th scope="col" class="p-4">
-                        <div class="flex items-center">
-                            <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
-                                   class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
-                            <label for="checkbox-all" class="sr-only">checkbox</label>
-                        </div>
-                    </th>
-                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                        Wedstrijd
-                    </th>
-                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                        Datum
-                    </th>
-                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                        Sluiting inschrijvingen
-                    </th>
-                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                        Locatie
-                    </th>
-                    <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                       Diciplines
-                    </th>
-                    <th scope="col" class="p-4">
-                    </th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                {% for contest in contests %}
-                    <tr class="hover:bg-gray-100">
-                        <td class="p-4 w-4">
-                            <div class="flex items-center">
-                                <input id="checkbox" aria-describedby="checkbox-1" type="checkbox"
-                                       class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
-                                <label for="checkbox" class="sr-only">checkbox</label>
-                            </div>
-                        </td>
-                        <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
-                            <div class="text-base font-semibold text-gray-900">{{ contest.name }}</div>
-                        </td>
-                        <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date('d-m-Y') }}</td>
-                        <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date_modify(-craue_setting('days_before_reg_close')|default("0")~"day")|ago }}</td>
-                        <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.location }}</td>
-                        <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.disciplines }}</td>
-                        <td class="p-4 whitespace-nowrap space-x-2">
-                            <a href="{{ path('fe_registration_register', {contest: contest.id}) }}" type="button" data-modal-toggle="delete-user-modal"
-                                    class="text-white bg-green-400 hover:bg-green-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
-                                Inschrijven
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-                {% if contests is empty %}
-                <!-- warning h3 tailwind -->
-                <div class="mt-4 items-center justify-center h-full">
-                    <h3 class="text-red-500 text-center text-xl">
-                        Er zijn geen wedstrijden gepland.
+{% block body %}
+    <div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 ">
+        <main class="h-full w-full overflow-y-auto">
+            <div class="container px-6 mx-auto grid">
+                <div class="my-10 bg-white p-5 rounded-md shadow-md">
+                    <h3 class="my-2 mb-4 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        Wedstrijden
                     </h3>
-                    {%  endif %}
+
+                    <table class="table-fixed min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="p-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
+                                           class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
+                                    <label for="checkbox-all" class="sr-only">checkbox</label>
+                                </div>
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Wedstrijd
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Datum
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Sluiting inschrijvingen
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Locatie
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Diciplines
+                            </th>
+                            <th scope="col" class="p-4">
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        {% for contest in contests %}
+                            {% set dateClosed = contest.date|date_modify("-"~craue_setting('days_before_reg_close')~"day") %}
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-4 w-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox" aria-describedby="checkbox-1" type="checkbox"
+                                               class="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded">
+                                        <label for="checkbox" class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                                    <div class="text-base font-semibold text-gray-900">{{ contest.name }}</div>
+                                </td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date('d-m-Y') }}</td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ dateClosed|date('d-m-Y') }}</td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.location }}</td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.disciplines }}</td>
+                                <td class="p-4 whitespace-nowrap space-x-2">
+                                    {% if contestOpen(contest.id) %}
+                                        <a href="{{ path('fe_registration_register', {contest: contest.id}) }}"
+                                           type="button" data-modal-toggle="delete-user-modal"
+                                           class="text-white bg-green-400 hover:bg-green-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                                            Inschrijven
+                                        </a>
+                                    {% else %}
+                                        <span class="text-white bg-gray-400 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">Inschrijving gesloten</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if contests is empty %}
+                    <!-- warning h3 tailwind -->
+                    <div class="mt-4 items-center justify-center h-full">
+                        <h3 class="text-center text-xl">
+                            Er zijn geen wedstrijden gepland.
+                        </h3>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
+    </div>
+    </div>
 
-    </main>
-</div>
-</div>
-
-</body>
+    </body>
+{% endblock %}

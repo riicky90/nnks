@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\OrdersRepository;
 use App\Repository\RegistrationsRepository;
 use App\Repository\TeamRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,7 +13,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 class DashboardController extends AbstractController
 {
     #[Route('/', name: 'dashboard_index', methods: ['GET'])]
-    public function index(ChartBuilderInterface $chartBuilder, RegistrationsRepository $registrations, TeamRepository $teams)
+    public function index(ChartBuilderInterface $chartBuilder, OrdersRepository $ordersRepository, RegistrationsRepository $registrations, TeamRepository $teams)
     {
         $chart = $chartBuilder->createChart(Chart::TYPE_LINE);
 
@@ -40,8 +41,11 @@ class DashboardController extends AbstractController
             ],
         ]);
 
+        $orders = $ordersRepository->findBy(["OrderStatus" => "payed"], ["createdAt" => "ASC"], 10, 0);
+
         return $this->render('dashboard/index.html.twig', [
             'chart' => $chart,
+            'orders' => $orders,
             'totalTeams' => $teams->totalTeams(),
             'totalRegistrations' => $registrations->totalRegistrations()
         ]);

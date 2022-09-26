@@ -114,11 +114,10 @@ class RegistrationsRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('r');
         $qb->leftJoin('r.Team', 't');
-        $qb->leftJoin('t.Organisation', 'o');
         $qb->leftJoin('r.Contest', 'c');
-        $qb->where('t.Name LIKE :search OR o.Name LIKE :search OR c.Name LIKE :search');
+        $qb->where('t.Name LIKE :search OR c.Name LIKE :search');
         $qb->setParameter('search', '%'.$search.'%');
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery();
     }
 
 

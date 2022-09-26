@@ -6,6 +6,7 @@ use App\Entity\DanceCategory;
 use App\Form\DanceCategoryType;
 use App\Repository\DanceCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,10 +16,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class DanceCategoryController extends AbstractController
 {
     #[Route('/', name: 'dance_category_index', methods: ['GET'])]
-    public function index(DanceCategoryRepository $danceCategoryRepository): Response
+    public function index(Request $request, DanceCategoryRepository $danceCategoryRepository, PaginatorInterface $paginator): Response
     {
-        return $this->render('dance_category/index.html.twig', [
-            'dance_categories' => $danceCategoryRepository->findAll(),
+        $filter = $request->query->get('filter');
+        $reload = $request->query->get('reload');
+        $template = "dance_category/index.html.twig";
+
+        $danceCategories = $danceCategoryRepository->search($filter);
+
+        $pagination = $paginator->paginate(
+            $danceCategories,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        if ($reload) {
+            $template = "dance_category/_list.html.twig";
+        }
+
+        return $this->render($template, [
+            'dance_categories' => $pagination,
+            'filter' => $filter
         ]);
     }
 

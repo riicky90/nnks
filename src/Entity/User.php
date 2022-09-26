@@ -47,9 +47,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'CreatedBy', targetEntity: Registrations::class)]
     private Collection $registrations;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $DansSchool = null;
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: Team::class)]
+    private Collection $teams;
+
     public function __construct()
     {
         $this->registrations = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,6 +211,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($registration->getCreatedBy() === $this) {
                 $registration->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDansSchool(): ?string
+    {
+        return $this->DansSchool;
+    }
+
+    public function setDansSchool(?string $DansSchool): self
+    {
+        $this->DansSchool = $DansSchool;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): self
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): self
+    {
+        if ($this->teams->removeElement($team)) {
+            // set the owning side to null (unless already changed)
+            if ($team->getUser() === $this) {
+                $team->setUser(null);
             }
         }
 

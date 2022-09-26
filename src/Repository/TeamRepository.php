@@ -49,16 +49,16 @@ class TeamRepository extends ServiceEntityRepository
 
     }
 
-    public function searchPersonalTeam($organisation, $query): \Doctrine\ORM\Query
+    public function searchPersonalTeam($user, $query): \Doctrine\ORM\Query
     {
 
         $qb = $this->createQueryBuilder('t')
-            ->leftJoin('t.Trainer', 'trainer')
-            ->andWhere('t.Organisation = :organisation')
-            ->setParameter('organisation', $organisation);
+            ->leftJoin('t.User', 'user')
+            ->andWhere('t.User = :user')
+            ->setParameter('user', $user);
 
         if ($query) {
-            $qb->andWhere('t.Name LIKE :query OR t.MailTrainer LIKE :query OR trainer.FirstName LIKE :query')
+            $qb->andWhere('t.Name LIKE :query OR t.MailTrainer LIKE :query OR user.email LIKE :query')
                 ->setParameter('query', '%' . $query . '%');
         }
 
@@ -86,6 +86,16 @@ class TeamRepository extends ServiceEntityRepository
 
         return $qb;
 
+    }
+
+    public function search($search)
+    {
+        $qb = $this->createQueryBuilder('t');
+        $qb->leftJoin('t.User', 'u');
+        $qb->leftJoin('t.Category', 'c');
+        $qb->where('t.Name LIKE :search OR t.MailTrainer LIKE :search OR t.TrainerName LIKE :search OR u.DansSchool LIKE :search OR c.Name LIKE :search');
+        $qb->setParameter('search', '%'.$search.'%');
+        return $qb->getQuery();
     }
 
 }

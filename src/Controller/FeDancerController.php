@@ -30,7 +30,7 @@ class FeDancerController extends AbstractController
     {
         $userOrganisation = $userRepository->find($this->getUser())->getOrganisation();
 
-        $dancers = $dancersRepository->findByOrganisation($userOrganisation);
+        $dancers = $dancersRepository->findByUser($this->getUser());
 
         return $this->render('frontend/dancers/index.html.twig', [
             'dancers' => $dancers,

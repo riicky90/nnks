@@ -1,5 +1,6 @@
 import {Controller} from '@hotwired/stimulus';
 import $ from 'jquery';
+import {useDispatch} from "stimulus-use";
 
 const axios = require('axios').default;
 
@@ -9,9 +10,12 @@ export default class extends Controller {
         backdropColor: {type: String, default: 'rgba(0, 0, 0, 0.8)'},
         restoreScroll: {type: Boolean, default: true},
         formUrl: String,
+        refreshAfterSubmit: true
     }
 
     connect() {
+        useDispatch(this);
+
         // The class we should toggle on the container
         this.toggleClass = this.data.get('class') || 'hidden';
 
@@ -22,7 +26,7 @@ export default class extends Controller {
         this.backgroundHtml = this.data.get('backgroundHtml') || this._backgroundHTML();
 
         // Let the user close the modal by clicking on the background
-        this.allowBackgroundClose = (this.data.get('allowBackgroundClose') || 'true') === 'true';
+        this.allowBackgroundClose = (this.data.get('allowBackgroundClose') || 'true') === 'false';
 
         // Prevent the default action of the clicked element (following a link for example) when opening the modal
         this.preventDefaultActionOpening = (this.data.get('preventDefaultActionOpening') || 'true') === 'true';
@@ -42,6 +46,16 @@ export default class extends Controller {
                 this.modalBodyTarget.innerHTML = result.data;
                 this.modalTitleTarget.innerHTML = e.params.title;
                 this.containerTarget.classList.remove(this.toggleClass);
+
+
+                document.getElementById('download-file').addEventListener('click', function () {
+                    //get selected value by select name
+                    const selectedValue = document.getElementById('export_Contest').value;
+
+                    window.location = '/exportRegistrations/' + selectedValue;
+
+                });
+
             });
 
         if (this.preventDefaultActionOpening) {
@@ -55,25 +69,42 @@ export default class extends Controller {
             e.target.blur();
         }
 
-
         // Insert the background
         if (!this.data.get("disable-backdrop")) {
             document.body.insertAdjacentHTML('beforeend', this.backgroundHtml);
             this.background = document.querySelector(`#${this.backgroundId}`);
         }
 
-
     }
 
     async submitForm(event) {
-        event.preventDefault;
+        event.preventDefault();
         const $form = $(this.modalBodyTarget).find('form');
 
-        this.modalBodyTarget.innerHTML = await $.post({
-            url: $form.prop('action'),
-            method: $form.prop('method'),
-            data: $form.serialize(),
-        });
+        const formData = new FormData($form[0]);
+
+        try {
+            await $.ajax({
+                url: $form.prop('action'),
+                method: $form.prop('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+            });
+
+            this.close();
+            // TODO: save ajax state for navigation to edited item
+            this.dispatch('async:saved');
+
+
+            if (this.refreshAfterSubmitValue) {
+                window.location.reload();
+            }
+
+        } catch (error) {
+            console.log(error);
+            this.modalBodyTarget.innerHTML = error.text;
+        }
     }
 
     close(e) {
@@ -119,7 +150,7 @@ export default class extends Controller {
         this.saveScrollPosition();
 
         // Add classes to body to fix its position
-        document.body.classList.add('fixed', 'inset-x-0', 'overflow-hidden');
+        document.body.classList.add('overflow-hidden');
 
         // Add negative top position in order for body to stay in place
         document.body.style.top = `-${this.scrollPosition}px`;
