@@ -46,16 +46,6 @@ export default class extends Controller {
                 this.modalBodyTarget.innerHTML = result.data;
                 this.modalTitleTarget.innerHTML = e.params.title;
                 this.containerTarget.classList.remove(this.toggleClass);
-
-
-                document.getElementById('download-file').addEventListener('click', function () {
-                    //get selected value by select name
-                    const selectedValue = document.getElementById('export_Contest').value;
-
-                    window.location = '/exportRegistrations/' + selectedValue;
-
-                });
-
             });
 
         if (this.preventDefaultActionOpening) {
