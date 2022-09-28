@@ -49,7 +49,7 @@ class UserController extends AbstractController
         $form = $this->createForm(UserType::class, $user,
             [
                 'action' => $this->generateUrl('user_new'),
-                'method' => 'GET',
+                'method' => 'POST',
             ]
         );
 

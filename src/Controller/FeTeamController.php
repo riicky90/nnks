@@ -62,7 +62,7 @@ class FeTeamController extends AbstractController
             $entityManager->persist($team);
             $entityManager->flush();
 
-            return $this->redirectToRoute('fe_team_index');
+            $this->addFlash('success', 'Team toegvoegd');
         }
 
         return $this->renderForm('frontend/team/_form.html.twig', [
@@ -83,7 +83,7 @@ class FeTeamController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'fe_team_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Team $team, $id, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Team $team, $id, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
     {
         $form = $this->createForm(TeamType::class, $team, [
             'action' => $this->generateUrl('fe_team_edit', ['id' => $id])
@@ -91,9 +91,10 @@ class FeTeamController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $entityManager->flush();
 
-            return $this->redirectToRoute('fe_team_index');
+            $this->addFlash('success', 'Team opgeslagen');
         }
 
         return $this->renderForm('/frontend/team/_form.html.twig', [

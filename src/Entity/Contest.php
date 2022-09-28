@@ -43,11 +43,20 @@ class Contest
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     private $EntranceFee;
 
-    #[ORM\Column(type: 'text')]
-    private $Disciplines;
+    #[ORM\Column(type: 'json')]
+    private $Disciplines = [];
 
     #[ORM\OneToMany(mappedBy: 'Contest', targetEntity: EventScan::class, orphanRemoval: true)]
     private Collection $eventScans;
+
+    #[ORM\Column(length: 255)]
+    private ?string $LocationAddress = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $LocationZipCode = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $LocationCity = null;
 
     public function __construct()
     {
@@ -191,12 +200,12 @@ class Contest
         return $this;
     }
 
-    public function getDisciplines(): ?string
+    public function getDisciplines(): array
     {
         return $this->Disciplines;
     }
 
-    public function setDisciplines(string $Disciplines): self
+    public function setDisciplines(array $Disciplines): self
     {
         $this->Disciplines = $Disciplines;
 
@@ -229,6 +238,49 @@ class Contest
                 $eventScan->setContest(null);
             }
         }
+
+        return $this;
+    }
+
+    const DICIPLINESLIST = array(
+        'Streetdance/HipHop' => 'Streetdance/HipHop',
+        'Showdance' => 'Showdance',
+        'Moderne dans' => 'Moderne dans',
+        'Mega Crew Dance' => 'Mega Crew Dance'
+    );
+
+    public function getLocationAddress(): ?string
+    {
+        return $this->LocationAddress;
+    }
+
+    public function setLocationAddress(string $LocationAddress): self
+    {
+        $this->LocationAddress = $LocationAddress;
+
+        return $this;
+    }
+
+    public function getLocationZipCode(): ?string
+    {
+        return $this->LocationZipCode;
+    }
+
+    public function setLocationZipCode(string $LocationZipCode): self
+    {
+        $this->LocationZipCode = $LocationZipCode;
+
+        return $this;
+    }
+
+    public function getLocationCity(): ?string
+    {
+        return $this->LocationCity;
+    }
+
+    public function setLocationCity(string $LocationCity): self
+    {
+        $this->LocationCity = $LocationCity;
 
         return $this;
     }

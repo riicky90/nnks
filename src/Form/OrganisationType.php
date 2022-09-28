@@ -17,22 +17,45 @@ class OrganisationType extends AbstractType
         $builder
             ->add('Name', null, [
                 'label' => 'Naam',
+                'attr' => [
+                    'placeholder' => 'Naam van de organisatie'
+                ]
             ])
-            ->add('Adres')
+            ->add('Adres', null, [
+                'label' => 'Adres',
+                'attr' => [
+                    'placeholder' => 'Adres van de organisatie'
+                ]
+            ])
             ->add('ZipCode', null, [
                 'label' => 'Postcode',
+                'attr' => [
+                    'placeholder' => 'Postcode van de organisatie',
+                ]
             ])
             ->add('City', null, [
                 'label' => 'Plaats',
+                'attr' => [
+                    'placeholder' => 'Plaats van de organisatie',
+                ]
             ])
             ->add('Email', null, [
                 'label' => 'E-mail',
+                'attr' => [
+                    'placeholder' => 'E-mail adres van de organisatie',
+                ]
             ])
             ->add('Phone', null, [
                 'label' => 'Telefoon',
+                'attr' => [
+                    'placeholder' => 'Telefoonnummer van de organisatie',
+                ]
             ])
             ->add('MollieApiKey', null, [
                 'label' => 'Mollie API Sleutel',
+                'attr' => [
+                    'placeholder' => 'Mollie API sleutel van de organisatie',
+                ]
             ])
         ;
     }

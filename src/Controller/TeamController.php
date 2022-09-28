@@ -48,7 +48,7 @@ class TeamController extends AbstractController
         $form = $this->createForm(TeamType::class, $team,
             [
                 'action' => $this->generateUrl('team_new'),
-                'method' => 'GET',
+                'method' => 'POST',
             ]);
         $form->handleRequest($request);
 

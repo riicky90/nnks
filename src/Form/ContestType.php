@@ -5,7 +5,10 @@ namespace App\Form;
 use App\Entity\Contest;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,25 +17,69 @@ class ContestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('Name')
-            ->add('Date', DateType::class, [
-                'widget' => 'single_text',
+            ->add('Name', null, [
+                'label' => 'Naam wedstrijd',
                 'attr' => [
-                    'data-stripe' => ''
+                    'placeholder' => 'Voorronde, Finale, Sow What You Got etc.',
                 ],
             ])
-            ->add('Location')
-            ->add('Organisation')
-            ->add('Description')
-            ->add('Enabled', null, [
-                'label' => 'Actief'
+            ->add('Date', DateType::class, [
+                'label' => 'Datum',
+                'widget' => 'single_text',
+                'attr' => [
+                    'data-stripe' => '',
+                    'placeholder' => 'Datum van de wedstrijd',
+                ],
             ])
-            ->add('Disciplines')
-            ->add('EntranceFee', null, [
-                'label' => 'Entree geld'
+            ->add('Location', null, [
+                'label' => 'Locatie',
+                'attr' => [
+                    'placeholder' => 'Naam van de locatie (bv:  Leek of Urk)',
+                ],
+            ])
+            ->add('LocationAddress', null, [
+                'label' => 'Locatie adres',
+                'attr' => [
+                    'placeholder' => 'Adres van de locatie',
+                ],
+            ])
+            ->add('LocationZipCode', null, [
+                'label' => 'Locatie postcode',
+                'attr' => [
+                    'placeholder' => 'Postcode van de locatie',
+                    'class' => 'alginside',
+                ],
+            ])
+            ->add('LocationCity', null, [
+                'label' => 'Locatie plaats',
+                'attr' => [
+                    'placeholder' => 'Plaats van de locatie',
+                    'class' => 'alginside',
+                ],
+            ])
+            ->add('Organisation', null, [
+                'label' => 'Organisatie',
+                'attr' => [
+                    'placeholder' => 'Naam van de organisatie',
+                ],
+            ])
+            ->add('Description', TextareaType::class, [
+                'label' => 'Beschrijving',
+                'attr' => [
+                    'placeholder' => 'Beschrijving voor de website',
+                ],
+            ])
+            ->add('Disciplines', ChoiceType::class, [
+                'label' => 'Disciplines',
+                'choices' => Contest::DICIPLINESLIST,
+                'placeholder' => 'Kies één of meerdere disciplines',
+                'multiple' => true,
+                'autocomplete' => true,
             ])
             ->add('RegistrationFee', null, [
                 'label' => 'Inschrijfgeld'
+            ])->add('Enabled', CheckboxType::class, [
+                'label' => 'Wedstrijd publiceren'
             ]);
     }
 

@@ -5,9 +5,9 @@
         <main class="h-full w-full overflow-y-auto">
             <div class="container px-6 mx-auto grid">
                 <div class="my-10 bg-white p-5 rounded-md shadow-md">
-                    <h3 class="my-2 mb-4 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                    <h1 class="text-xl font-bold text-gray-900 mb-2">
                         Wedstrijden
-                    </h3>
+                    </h1>
 
                     <table class="table-fixed min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
@@ -55,7 +55,7 @@
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.date|date('d-m-Y') }}</td>
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ dateClosed|date('d-m-Y') }}</td>
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.location }}</td>
-                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ contest.disciplines }}</td>
+                                <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{% for dis in contest.disciplines %} {{ dis }}, {% endfor %}</td>
                                 <td class="p-4 whitespace-nowrap space-x-2">
                                     {% if contestOpen(contest.id) %}
                                         <a href="{{ path('fe_registration_register', {contest: contest.id}) }}"

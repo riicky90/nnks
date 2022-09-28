@@ -15,13 +15,18 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
+            ->add('email', null, [
+                'label' => 'E-mail',
+                'attr' => [
+                    'placeholder' => 'E-mail adres van nieuwe gebruiker',
+                    'pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$',
+                ]
+            ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Wachtwoord',
                 'required' => false,
                 'mapped' => false,
             ])
-            ->add('Organisation')
             ->add('isVerified', ChoiceType::class, [
                 'choices' => [
                     'Nee' => false,

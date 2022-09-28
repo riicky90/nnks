@@ -13,6 +13,7 @@ use App\Repository\RegistrationsRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\FileUploader;
+use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

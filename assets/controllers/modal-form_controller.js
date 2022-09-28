@@ -46,6 +46,16 @@ export default class extends Controller {
                 this.modalBodyTarget.innerHTML = result.data;
                 this.modalTitleTarget.innerHTML = e.params.title;
                 this.containerTarget.classList.remove(this.toggleClass);
+
+
+                document.getElementById('download-file').addEventListener('click', function () {
+                    //get selected value by select name
+                    const selectedValue = document.getElementById('export_Contest').value;
+
+                    window.location = '/exportRegistrations/' + selectedValue;
+
+                });
+
             });
 
         if (this.preventDefaultActionOpening) {
@@ -72,6 +82,13 @@ export default class extends Controller {
         const $form = $(this.modalBodyTarget).find('form');
 
         const formData = new FormData($form[0]);
+
+        if ($form[0].checkValidity()) {
+
+        } else {
+            $form[0].reportValidity();
+            return;
+        }
 
         try {
             await $.ajax({

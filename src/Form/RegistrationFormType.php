@@ -19,24 +19,33 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
+            ->add('email', null, [
+                'label' => 'E-mail',
+                'attr' => [
+                    'placeholder' => 'Je eigen e-mail adres',
+                    'pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$',
+                ]
+            ])
             ->add('DansSchool', null, [
                 'label' => 'Dansschool',
-                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Naam van de dansschool',
+                ],
+                'required' => true
             ])
             ->add('plainPassword', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password'],
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                    'placeholder' => 'Kies een wachtwoord',
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
+                        'minMessage' => 'Wachtwoord moet mimiaal uit {{ limit }} karakters bestaan',
                         'max' => 4096,
                     ]),
                 ],

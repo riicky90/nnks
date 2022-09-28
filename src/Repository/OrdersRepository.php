@@ -43,6 +43,21 @@ class OrdersRepository extends ServiceEntityRepository
         ;
     }
 
+    //get last 10 perosnal orders for this user
+    public function personalOrderLastTen($user)
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.Registration', 'r')
+            ->leftJoin('r.Team', 't')
+            ->andWhere('t.User = :val')
+            ->setParameter('val', $user)
+            ->orderBy('o.createdAt', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     /*
     public function findOneBySomeField($value): ?Orders
     {

@@ -64,7 +64,7 @@ class RegistrationsType extends AbstractType
             ->add('Music', DropzoneType::class, [
                 'label' => 'Muziek bestand',
                 'attr' => [
-                    'placeholder' => 'Selecteer of drop hier je muziekbestand (.mp3 of .wav)',
+                    'placeholder' => 'Selecteer of drop hier je muziekbestand (.mp3)',
                 ],
                 'mapped' => false,
                 'required' => false,
@@ -77,7 +77,7 @@ class RegistrationsType extends AbstractType
                             'audio/wav',
                             'audio/x-wav',
                         ],
-                        'mimeTypesMessage' => 'Upload een geldig .mp3 of .wav bestand!',
+                        'mimeTypesMessage' => 'Upload een geldig .mp3 bestand!',
                     ])
                 ],
             ])

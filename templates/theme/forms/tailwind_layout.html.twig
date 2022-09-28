@@ -10,8 +10,14 @@
     {% set row_class = row_class|default('mt-2') %}
 <input type="{{ type }}"
            id="{{ id}}"
+       {% if attr.pattern is defined %}
+           pattern="{{ attr.pattern }}"
+    {% endif %}
+       {% if attr.placeholder is defined %}
+           placeholder="{{ attr.placeholder }}"
+       {% endif %}
            name={{ full_name }}
-           class="{{ block('input_class') }} mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+           class="{{ block('input_class') }} mt-2 px-2 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2"
            {% if value is not empty %}value="{{ value }}" {% endif %}
             {% if required is defined and required == true %}required {% endif %}/>
 {% endblock form_widget_simple %}
@@ -33,16 +39,15 @@
     {% endif %}
 {%- endblock choice_widget -%}
 
-{% block checkbox_widget %}
-    {% set row_class = row_class|default('mt-2 px-3') %}
-    {{ parent() }}
-{% endblock checkbox_widget %}
+{%- block checkbox_widget -%}
+    {%- set widget_class = widget_class|default('mr-2') -%}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
 
 {% block button_widget %}
     {% set row_class = row_class|default('mt-5') %}
     {{ parent() }}
 {% endblock button_widget %}
-
 
 {%- block choice_widget_expanded -%}
     <div {{ block('widget_container_attributes') }}>
@@ -76,3 +81,24 @@
 {% block input_class -%}
     {% if form.vars.errors|length %}border-red border-1{% endif %} mt-2 px-3 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5
 {% endblock input_class -%}
+
+{%- block form_help -%}
+    {%- set help_attr = help_attr|merge({ class: help_attr.class|default(help_class|default('mt-1 text-gray-600 text-sm')) }) -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block checkbox_row -%}
+    {%- set row_attr = row_attr|merge({ class: row_attr.class|default(row_class|default('mb-6 mt-4')) }) -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_errors(form) -}}
+        <div class="inline-flex items-center">
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_label(form) -}}
+        </div>
+        {{- form_help(form) -}}
+    </div>
+{%- endblock checkbox_row -%}

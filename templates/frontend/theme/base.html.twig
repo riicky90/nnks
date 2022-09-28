@@ -17,6 +17,7 @@
         {{ include('/theme/_alert.html.twig') }}
     {% endif %}
     {% for message in app.flashes('success') %}
+        <!-- flash -->
             {{ include('/theme/_alert.html.twig', {message: message}) }}
         </div>
     {% endfor %}

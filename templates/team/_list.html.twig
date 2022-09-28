@@ -38,7 +38,7 @@
             </td>
             <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.TrainerName }}</td>
             <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.MailTrainer }}</td>
-            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.Category.Name }}</td>
+            <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.Category.Name|default('Niet bekend') }}</td>
             <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.User.Dansschool }}</td>
             <td class="p-4 whitespace-nowrap space-x-2">
                 <button type="button" data-action="modal-form#open"
@@ -62,7 +62,8 @@
                                 text: 'Weet u zeker dat u dit team wilt verwijderen?',
                                 confirmButtonText: 'Verwijderen',
                                 icon: 'warning',
-                                submitAsync: true
+                                submitAsync: true,
+                                refreshAfterSubmit: true,
                             }) }} data-action="submit-confirm#onSubmit">
 
                     <input type="hidden" name="_token"

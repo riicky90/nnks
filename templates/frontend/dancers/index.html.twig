@@ -1,18 +1,27 @@
 {% extends '/frontend/theme/base.html.twig' %}
 
 {% block body %}
-    <div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 ">
+    <div {{ stimulus_controller("modal-form", {refreshAfterSubmit: true}) }} class="flex h-screen bg-gray-50 ">
         <main class="h-full w-full overflow-y-auto">
             <div class="container px-6 mx-auto grid">
                 <div class="my-10 bg-white p-5 rounded-md shadow-md">
                     <div class="flex mb-4">
-                        <div class="w-1/2 h-12"><h3
-                                    class="flex my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
-                                Dancers </h3></div>
+                        <div class="w-1/2 h-12"><h1 class="text-xl font-bold text-gray-900 mb-2">
+                                Dansers </h1></div>
 
-                        <div class="w-1/2 h-12 ml-80"><a
-                                    class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center"
-                                    href="{{ path('fe_dancer_new') }}">Danser toevoegen</a>
+                        <div class="w-1/2 h-12 ml-80">
+                            <button type="button" data-action="modal-form#open"
+                                    data-modal-form-title-param="Danser toevoegen"
+                                    data-modal-form-url-param="{{ path('fe_dancer_new') }}"
+                                    class="w-1/2 text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto">
+                                <svg class="-ml-1 mr-2 h-6 w-6" fill="currentColor" viewBox="0 0 20 20"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                          clip-rule="evenodd"></path>
+                                </svg>
+                                Danser toevoegen
+                            </button>
                         </div>
                     </div>
                     <table class="table-fixed min-w-full divide-y divide-gray-200">
@@ -46,7 +55,42 @@
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ dancer.lastName }}</td>
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ dancer.birthDay|date('d-m-Y') }}</td>
                                 <td class="p-4 whitespace-nowrap space-x-2">
-
+                                    <button type="button" data-action="modal-form#open"
+                                            data-modal-form-title-param="Danser bewerken"
+                                            data-modal-form-url-param="{{ path('fe_dancer_edit', {id: dancer.id}) }}"
+                                            class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+                                            <path fill-rule="evenodd"
+                                                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                                  clip-rule="evenodd"></path>
+                                        </svg>
+                                        Bewerk danser
+                                    </button>
+                                    <form class="inline-flex" action="{{ path('fe_dancer_delete', {id: dancer.id}) }}"
+                                          method="POST"
+                                            {{ stimulus_controller('submit-confirm',
+                                                {
+                                                    title: 'Danser verwijderen',
+                                                    text: 'Weet u zeker dat u deze danser verwijderen?',
+                                                    confirmButtonText: 'Verwijderen',
+                                                    icon: 'warning',
+                                                    submitAsync: true,
+                                                    refreshAfterSubmit: true
+                                                }) }} data-action="submit-confirm#onSubmit">
+                                        <input type="hidden" name="_token"
+                                               value="{{ csrf_token('delete' ~ dancer.id) }}"/>
+                                        <button class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-200 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2 text-center">
+                                            <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                      clip-rule="evenodd"></path>
+                                            </svg>
+                                            Verwijderen
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -61,9 +105,12 @@
                         {% endif %}
                     </div>
                 </div>
+                {{ include('/theme/_modal.html.twig') }}
             </div>
         </main>
+
     </div>
-    </div>
+
+
 
 {% endblock %}

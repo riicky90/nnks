@@ -41,52 +41,57 @@ class FeDancerController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $dancer = new Dancers();
-        $form = $this->createForm(DancersType::class, $dancer);
+        $form = $this->createForm(DancersType::class, $dancer, [
+            'action' => $this->generateUrl('fe_dancer_new'),
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+
             $entityManager->persist($dancer);
             $entityManager->flush();
 
-            return $this->redirectToRoute('fe_dancers_index');
+            $this->addFlash('success', 'Danser toegevoegd');
         }
 
-        $form->remove('registrations');
-
-        return $this->renderForm('frontend/dancers/new.html.twig', [
+        return $this->renderForm('frontend/dancers/_form.html.twig', [
             'dancers' => $dancer,
             'form' => $form,
         ]);
     }
 
     #[Route('/{id}', name: 'fe_dancer_delete', methods: ['POST'])]
-    public function delete(Request $request, Team $team, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Dancers $dancers, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$team->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($team);
+        if ($this->isCsrfTokenValid('delete' . $dancers->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($dancers);
             $entityManager->flush();
         }
+        //message succvol verwijderd
+        $this->addFlash('success', 'Danser verwijderd');
 
-        return $this->redirectToRoute('fe_team_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('fe_dancers_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/edit', name: 'fe_team_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Team $team, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'fe_dancer_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Dancers $dancers, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(TeamType::class, $team, [
-            'show_organisation' => false
+        $form = $this->createForm(DancersType::class, $dancers, [
+            'action' => $this->generateUrl('fe_dancer_edit', ['id' => $dancers->getId()]),
+            'method' => 'POST'
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('fe_team_index');
-        }
+            $this->addFlash('success', 'Danser opgeslagen');
 
-        return $this->renderForm('/frontend/team/edit.html.twig', [
-            'team' => $team,
+        }
+        return $this->renderForm('/frontend/team/_form.html.twig', [
+            'dancer' => $dancers,
             'form' => $form,
         ]);
     }
