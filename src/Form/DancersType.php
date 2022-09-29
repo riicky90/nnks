@@ -27,6 +27,18 @@ class DancersType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('Team', EntityType::class, [
+                'class' => Team::class,
+                'query_builder' => function (TeamRepository $er) {
+                    return $er->createQueryBuilder('t')
+                        ->where('t.User = :user')
+                        ->setParameter('user', $this->user->getUser());
+                },
+                'choice_label' => 'Name',
+                'choice_value' => 'Id',
+                'label' => 'Team',
+                'required' => true,
+            ])
             ->add('FirstName', TextType::class, [
                 'label' => 'Voornaam',
                 'attr' => [

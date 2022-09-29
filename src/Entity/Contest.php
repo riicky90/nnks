@@ -40,9 +40,6 @@ class Contest
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     private $RegistrationFee;
 
-    #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
-    private $EntranceFee;
-
     #[ORM\Column(type: 'json')]
     private $Disciplines = [];
 
@@ -184,18 +181,6 @@ class Contest
     public function setRegistrationFee(string $RegistrationFee): self
     {
         $this->RegistrationFee = $RegistrationFee;
-
-        return $this;
-    }
-
-    public function getEntranceFee(): ?string
-    {
-        return $this->EntranceFee;
-    }
-
-    public function setEntranceFee(string $EntranceFee): self
-    {
-        $this->EntranceFee = $EntranceFee;
 
         return $this;
     }

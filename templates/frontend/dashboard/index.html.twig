@@ -82,10 +82,10 @@
                                                 {{ order.createdAt|date('d-m-Y H:i:s') }}
                                             </td>
                                             <td class="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                                <span class="p-1 text-sm rounded {% if order.orderStatus == 'payed'%} bg-green-200 {% else %} bg-red-200 {% endif%}"> {{ order.orderStatus }}</span>
+                                                <span class="p-1 text-sm rounded {% if order.orderStatus == 'paid'%} bg-green-200 {% else %} bg-red-200 {% endif%}"> {{ order.orderStatus }}</span>
                                             </td>
                                             <td class="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                                {{ order.amount }}
+                                                € {{ order.amount }}
                                             </td>
                                         </tr>
                                     {% endfor %}

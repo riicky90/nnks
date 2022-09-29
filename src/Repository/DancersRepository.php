@@ -21,14 +21,17 @@ class DancersRepository extends ServiceEntityRepository
         parent::__construct($registry, Dancers::class);
     }
 
-    public function findByUser($user): int|array|string
+    public function findByUser($user, $search): int|array|string
     {
-        return $this->createQueryBuilder('d')
-            ->leftJoin('d.team', 'o')
-            ->andWhere('o.User = :user')
+        $qb = $this->createQueryBuilder('d')
+            ->leftJoin('d.team', 't')
+            ->andWhere('t.User = :user')
+            ->andWhere('d.FirstName LIKE :search OR d.LastName LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
             ->setParameter('user', $user)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->orderBy('d.id', 'ASC')
+            ->getQuery();
+
+        return $qb->getResult();
     }
 }

@@ -24,7 +24,7 @@ services:
     App\EventListener\UserListener:
         tags:
             - name: 'doctrine.event_listener'
-              event: 'postPersist'
+              event: 'postUpdate'
 
     App\Service\FileUploader:
         arguments:

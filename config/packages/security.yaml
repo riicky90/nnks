@@ -37,6 +37,7 @@ security:
   # Note: Only the *first* access control that matches will be used
   access_control:
       - { path: ^/login, roles: PUBLIC_ACCESS }
+      - { path: ^/mollie-webhook, roles: PUBLIC_ACCESS }
       - { path: ^/eventscan/scan, roles: [ROLE_ADMIN, ROLE_SCANNER] }
       - { path: ^/verify/email, roles: PUBLIC_ACCESS }
       - { path: ^/api/contests, roles: PUBLIC_ACCESS }
@@ -44,6 +45,7 @@ security:
       - { path: ^/register, roles: PUBLIC_ACCESS }
       - { path: ^/frontend, roles: ROLE_USER }
       - { path: ^/makepayment, roles: ROLE_USER }
+      - { path: ^/tickets, roles: [ROLE_USER, ROLE_ADMIN] }
       - { path: ^/, roles: ROLE_ADMIN }
 when@test:
   security:

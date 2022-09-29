@@ -35,7 +35,7 @@
                 {{ user.email }}
             </td>
             <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{% for role in user.roles %}
-                    <span class="text-xs text-white bg-cyan-500 p-2 rounded">{{ role }}</span>{% endfor %}
+                    <span class="text-xs text-white bg-cyan-500 p-2 rounded">{% if role == "ROLE_ADMIN" %}ADMIN{% else %}COACH{% endif %}</span>{% endfor %}
             </td>
             <td class="p-4 whitespace-nowrap text-base font-normal text-gray-900">
                 <div class="flex items-center">

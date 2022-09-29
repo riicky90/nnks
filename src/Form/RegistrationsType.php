@@ -64,13 +64,13 @@ class RegistrationsType extends AbstractType
             ->add('Music', DropzoneType::class, [
                 'label' => 'Muziek bestand',
                 'attr' => [
-                    'placeholder' => 'Selecteer of drop hier je muziekbestand (.mp3)',
+                    'placeholder' => 'Selecteer of drop hier je muziekbestand (.mp3) maximaal 512mb',
                 ],
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '1G',
+                        'maxSize' => '512M',
                         'mimeTypes' => [
                             'audio/mpeg',
                             'audio/mp3',
@@ -112,7 +112,6 @@ class RegistrationsType extends AbstractType
             'required' => true,
             'query_builder' => function (TeamRepository $teamRepository) use ($options) {
                 $qb = $teamRepository->createQueryBuilder('t');
-
                 if($options["contest"]) {
                     $expr = $this->em->getExpressionBuilder();
                     $qb->andWhere(

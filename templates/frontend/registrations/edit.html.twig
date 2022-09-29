@@ -38,7 +38,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-2">Inschrijfgeld p.p.</td>
                                         <td class="px-4 py-2"><span id="total_dancers">0</span>x</td>
-                                        <td class="px-4 py-2">€ {{ Contest.registrationFee }}</td>
+                                        <td class="px-4 py-2">€ {{ registration.contest.registrationFee }}</td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-2"></td>
@@ -56,8 +56,8 @@
                                     <tr>
                                         <td class="px-4 py-2"></td>
                                         <td class="px-4 py-2">Reeds betaald</td>
-                                        <td class="px-4 py-2">- € <span
-                                                    id="payed_total">{% if totalPayed is defined %}{{ totalPayed|number_format(2, '.', ',') }}{% endif %}</span>
+                                        <td class="px-4 py-2">€ <span
+                                                    id="paid_total">{% if totalpaid is defined %}{{ totalpaid|number_format(2, '.', ',') }}{% else %} 0.00 {% endif %}</span>
                                         </td>
                                         </td>
                                     </tr>
@@ -102,10 +102,10 @@
 
         function calculateTotalPrice() {
             let dancers_count = document.getElementsByClassName("plugin-remove_button")[0].getElementsByClassName('item').length;
-            let total = dancers_count * '{{ Contest.registrationFee }}';
-            let payed_total = document.getElementById('payed_total').innerText;
+            let total = dancers_count * '{{ registration.contest.registrationFee }}';
+            let paid_total = document.getElementById('paid_total').innerText;
 
-            if (payed_total >= total) {
+            if (paid_total >= total) {
                 document.getElementById('pay-button').style.display = 'none';
                 document.getElementById('cost-overview').style.display = 'none';
                 document.getElementById('save-button').style.display = 'block';
@@ -113,7 +113,7 @@
                 document.getElementById('pay-button').style.display = 'block';
                 document.getElementById('cost-overview').style.display = 'block';
                 document.getElementById('save-button').style.display = 'none';
-                document.getElementById('left_total').innerHTML = (total - payed_total).toFixed(2);
+                document.getElementById('left_total').innerHTML = (total - paid_total).toFixed(2);
 
             }
 
@@ -124,11 +124,11 @@
                 document.querySelectorAll('[name="registrations"]')[0].submit();
             });
 
-            document.getElementById('pay-button').addEventListener('click', function (event) {
-                window.location.href = '/frontend/makepayment/{{ registration.id }}/'+(total - payed_total);
+            document.getElementById('pay-button').addEventListener('click', function () {
+
+                document.querySelectorAll('[name="registrations"]')[0].submit();
+
             });
-
-
         }
     </script>
 {% endblock %}

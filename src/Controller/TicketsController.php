@@ -2,14 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Registrations;
-use App\Repository\DancersRepository;
 use App\Repository\RegistrationsRepository;
-use Knp\Bundle\SnappyBundle\Snappy\Response\PdfResponse;
 use Knp\Snappy\Pdf;
-use mPDF;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -20,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TicketsController extends AbstractController
 {
     #[Route('/download/{registration}', name: 'tickets_download', methods: ['GET'])]
-    public function index($registration, RegistrationsRepository $registrationsRepository, DancersRepository $dancersRepository, Pdf $pdf)
+    public function index($registration, RegistrationsRepository $registrationsRepository, Pdf $pdf)
     {
         $registrations = $registrationsRepository->find($registration);
         $dancers = $registrations->getDancers();
@@ -44,7 +39,7 @@ class TicketsController extends AbstractController
     }
 
     #[Route('/email/{registration}', name: 'tickets_email', methods: ['GET'])]
-    public function email($registration, RegistrationsRepository $registrationsRepository, Pdf $pdf, DancersRepository $dancersRepository, MailerInterface $mailer): Response
+    public function email($registration, RegistrationsRepository $registrationsRepository, Pdf $pdf, MailerInterface $mailer): Response
     {
         $registrations = $registrationsRepository->find($registration);
 
@@ -54,9 +49,6 @@ class TicketsController extends AbstractController
             'registration' => $registrations,
             'dancers' => $dancers
         ])->getContent();
-
-        //generate pdf and download in the browser
-        $filename = 'ticket_' . $registrations->getId() . '.pdf';
 
         $pdf = $pdf->getOutputFromHtml($html);
 

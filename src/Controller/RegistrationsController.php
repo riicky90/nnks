@@ -86,9 +86,9 @@ class RegistrationsController extends AbstractController
             'totalOrder' => $orders->createQueryBuilder('o')
                 ->select('SUM(o.Amount)')
                 ->andWhere('o.Registration = :registration')
-                ->andWhere('o.OrderStatus = :payed')
+                ->andWhere('o.OrderStatus = :paid')
                 ->setParameter('registration', $registration)
-                ->setParameter('payed', 'payed')
+                ->setParameter('paid', 'paid')
                 ->getQuery()
                 ->getSingleScalarResult(),
         ]);

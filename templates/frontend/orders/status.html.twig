@@ -1,36 +1,44 @@
-{% extends 'frontend/theme/base.html.twig' %}
+{% include 'frontend/theme/head.html.twig' %}
+<style>
+    lottie-player {
+        margin: 0 auto;
+    }
+</style>
+{% if payment.status == "paid" %}
 
-{% block body %}
-<div {{ stimulus_controller("modal-form") }} class="flex h-screen bg-gray-50 ">
-    <main class="h-full w-full overflow-y-auto">
-        <div class="container px-6 mx-auto grid">
-            <div class="my-10 bg-white p-5 rounded-md shadow-md">
-                <h3 class="my-2 text-1xl font-semibold text-gray-700 dark:text-gray-200">
-                    Betaal status
-                </h3>
-                {% if payment.status == "completed" %}
-                    <div class="mt-2">
-                        <p class="text-green-500">Je bestelling is betaald. Het ordernummer is: {{ payment.id }}</p>
-                    </div>
-                {% elseif payment.status == "error"%}
-                    <div class="mt-2">
-                        <p class="text-red-500">
-                            Fout bij afrekenen, je bestelling is niet betaald.<br />
-                            {{ payment.message }}
-                        </p>
-
-                    </div>
-                {% else %}
-                <div class="mt-2">
-                    <p class="text-red-500">
-                        Fout bij afrekenen, je bestelling is niet betaald.<br />
-                    </p>
-
-                </div>
-                {% endif %}
+    <div class="flex justify-center w-full min-h-screen">
+        <div class="text-center shadow-lg p-6 w-1/2">
+            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+            <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_txJcSM.json"
+                           background="transparent" speed="1" style="width: 300px; height: 300px;"
+                           autoplay></lottie-player>
+            <h1 class="text-black-500 text-2xl text-center">Je inschrijving is betaald.</h1>
+            <ul class="list-none mt-6 text-center">
+                <li class="text-black-500 text-xl">Order nummer: {{ payment.id }}</li>
+                <li class="text-black-500 text-xl">Bedrag: €{{ order.amount }}</li>
+                <li class="text-black-500 text-xl">Team: {{ order.registration.team.name }}</li>
+            </ul>
+            <div class="text-center mt-16">
+                <a href="{{ path('fe_registrations_index') }}" class="p-3 text-white rounded bg-cyan-600 hover:bg-cyan-700">Terug naar overzicht</a>
             </div>
         </div>
 
-    </main>
-</div>
-{% endblock %}
+
+    </div>
+
+{% else %}
+    <div class="flex justify-center w-full min-h-screen">
+        <div class="text-center shadow-lg p-6 w-1/2">
+
+            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qw8ewk7k.json"  background="transparent"  speed=".8"  style="width: 300px; height: 300px;"    autoplay></lottie-player>
+            <h1 class="text-black-500 text-2xl text-center">Betaling mislukt</h1>
+            <div class="mt-6">
+                <div class="text-center mt-16">
+                    <a href="{{ payment.checkoutUrl }}" class="p-3 text-white rounded bg-cyan-600 hover:bg-cyan-700">Probeer opnieuw</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endif %}

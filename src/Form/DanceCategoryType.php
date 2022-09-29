@@ -14,6 +14,9 @@ class DanceCategoryType extends AbstractType
         $builder
             ->add('Name', null, [
                 'label' => 'Naam categorie',
+                'attr' => [
+                    'placeholder' => 'Dansstijl – niveau – leeftijd',
+                ],
             ])
         ;
     }

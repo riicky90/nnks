@@ -117,8 +117,23 @@ class RegistrationsRepository extends ServiceEntityRepository
         $qb->leftJoin('r.Contest', 'c');
         $qb->where('t.Name LIKE :search OR c.Name LIKE :search');
         $qb->setParameter('search', '%'.$search.'%');
+
         return $qb->getQuery();
     }
 
+    //search function for registrations
+    public function searchPersonal($search, $user)
+    {
+        $qb = $this->createQueryBuilder('r');
+        $qb->leftJoin('r.Team', 't');
+        $qb->leftJoin('r.Contest', 'c');
+        $qb->andWhere('t.Name LIKE :search OR c.Name LIKE :search');
+        $qb->andWhere('t.User = :user');
+        $qb->setParameter('search', '%'.$search.'%');
+        $qb->setParameter('user', $user);
+        $qb->orderBy('r.createdAt', 'DESC');
+
+        return $qb->getQuery();
+    }
 
 }

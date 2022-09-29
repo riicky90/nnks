@@ -27,22 +27,24 @@ class FeRegistrationController extends AbstractController
     #[Route('/', name: 'fe_registrations_index')]
     public function registrations(RegistrationsRepository $registrationsRepository, Request $request, PaginatorInterface $paginator): Response
     {
+        $filter = $request->query->get('filter');
 
-        $registrations = $registrationsRepository->findBy(['CreatedBy' => $this->getUser()]);
+        $registrations = $registrationsRepository->searchPersonal($filter, $this->getUser());
 
         $pagination = $paginator->paginate(
             $registrations,
             $request->query->getInt('page', 1),
-            10
+            12
         );
 
         return $this->render('frontend/registrations/index.html.twig', [
             'registrations' => $pagination,
+            'filter' => $filter,
         ]);
     }
 
-    #[Route('/register/contest/{contest}', name: 'fe_registration_register')]
-    public function register(Request $request, $contest, ContestRepository $contestRepository, FileUploader $fileUploader, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
+    #[Route('/register/{contest}', name: 'fe_registration_register')]
+    public function register(Request $request, $contest, ContestRepository $contestRepository, FileUploader $fileUploader, EntityManagerInterface $entityManager, OrdersRepository $ordersRepository): Response
     {
         $contest = $contestRepository->find($contest);
 
@@ -72,47 +74,55 @@ class FeRegistrationController extends AbstractController
                 $this->addFlash('success', 'Inschrijving mislukt.<br /> ' . $e->getMessage());
             }
 
-            $amount = count($dancers) * $contest->getRegistrationFee();
-
             $registrations->setContest($contest);
             $entityManager->persist($registrations);
             $entityManager->flush();
 
-            return $this->redirectToRoute("make_payment",
-                [
-                    "registration" => $registrations->getId(),
-                    "contest" => $contest->getId(),
-                    "amount" => $amount
-                ]);
-        }
+            $amount = count($dancers) * $contest->getRegistrationFee();
 
+            $orders = $ordersRepository->findBy(['Registration' => $registrations]);
+
+            $amountpaid = 0;
+            foreach ($orders as $order) {
+                $amountpaid += $order->getAmount();
+            }
+
+            if ($amountpaid < $amount) {
+                return $this->redirectToRoute("make_payment",
+                    [
+                        "registration" => $registrations->getId(),
+                        "contest" => $contest->getId(),
+                        "amount" => $amount
+                    ]);
+            } else {
+                $this->addFlash('success', 'Inschrijving opgeslagen.');
+                return $this->redirectToRoute("fe_contests_index");
+            }
+
+
+        }
         return $this->render('frontend/registrations/new.html.twig', [
             'contest' => $contest,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/register/edit/{id}', name: 'fe_registration_edit')]
-    public function edit(Request $request, Registrations $registration, EntityManagerInterface $entityManager, FileUploader $fileUploader, OrdersRepository $ordersRepository, ContestRepository $contestRepository): Response
+    #[Route('/edit/{registration}', name: 'fe_registration_edit')]
+    public function edit(Request $request, Registrations $registration, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager, FileUploader $fileUploader, OrdersRepository $ordersRepository): Response
     {
-        $orders = $ordersRepository->findBy(['Registration' => $registration->getId(), 'OrderStatus' => 'payed']);
+        $curr = $registrationsRepository->find($registration->getId());
 
         $form = $this->createForm(RegistrationsType::class, $registration,
             [
                 'register' => true,
-                'edit' => false,
-                'action' => $this->generateUrl('fe_registration_edit', ['id' => $registration->getId()]),
-            ]);
-
-        $contest = $contestRepository->find($registration->getContest()->getId());
-        $team = $registration->getTeam();
+                'action' => $this->generateUrl('fe_registration_edit', ['registration' => $registration->getId()]),
+            ]
+        );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $dancers = $form->get('Dancers')->getData();
-
-            $registration->setTeam($team);
 
             try {
                 $musicFile = $form->get('Music')->getData();
@@ -126,28 +136,41 @@ class FeRegistrationController extends AbstractController
                 $this->addFlash('success', 'Inschrijving mislukt.<br /> ' . $e->getMessage());
             }
 
-            $amount = count($dancers) * $contest->getRegistrationFee();
-
-            $registration->setContest($contest);
+            $registration->setContest($curr->getContest());
             $entityManager->persist($registration);
             $entityManager->flush();
 
-            return $this->redirectToRoute("fe_registrations_index");
-        }
+            $amount = count($dancers) * $curr->getContest()->getRegistrationFee();
+            $orders = $ordersRepository->findBy(['Registration' => $curr->getId(), 'OrderStatus' => 'paid']);
 
-        $total = 0;
+            $amountpaid = 0;
+            foreach ($orders as $order) {
+                $amountpaid += $order->getAmount();
+            }
+
+
+            if ($amountpaid < $amount) {
+                return $this->redirectToRoute("make_payment",
+                    [
+                        "registration" => $registration->getId(),
+                        "contest" => $curr->getContest()->getId(),
+                    ]);
+            } else {
+                $this->addFlash('success', 'Inschrijving opgeslagen.');
+                return $this->redirectToRoute("fe_registrations_index");
+            }
+
+        }
+        $orders = $ordersRepository->findBy(['Registration' => $curr->getId(), 'OrderStatus' => 'paid']);
+
+        $amountpaid = 0;
         foreach ($orders as $order) {
-            $total += $order->getAmount();
+            $amountpaid += $order->getAmount();
         }
-
-        $form->remove('Team');
-
-        return $this->renderForm('frontend/registrations/edit.html.twig', [
+        return $this->render('frontend/registrations/edit.html.twig', [
             'registration' => $registration,
-            'Contest' => $contest,
-            'form' => $form,
-            'orderTotal' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
-            'totalPayed' => $total,
+            'totalpaid' => $amountpaid,
+            'form' => $form->createView(),
         ]);
     }
 }

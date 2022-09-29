@@ -23,7 +23,6 @@ class ContestRepository extends ServiceEntityRepository
         parent::__construct($registry, Contest::class);
     }
 
-
     public function allOpenContests()
     {
         return $this->createQueryBuilder('c')

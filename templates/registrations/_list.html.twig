@@ -97,10 +97,10 @@
                             {% if registration.numberOfDancers < craue_setting('minimum_num_dancers') %}
                                 {% set count = count +1 %}
                                 <li>
-                                    Er zijn nog niet genoeg dansers ingeschreven
+                                    Niet genoeg dansers ingeschreven {{ registration.numberOfDancers }} / {{ craue_setting('minimum_num_dancers') }}
                                 </li>
                             {% endif %}
-                            {% if registrationPayed(registration.id) %}
+                            {% if registrationpaid(registration.id) %}
                                 {% set count = count +1 %}
                                 <li>
                                     Het volledige bedrag is nog niet betaald

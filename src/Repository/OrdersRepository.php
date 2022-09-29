@@ -58,6 +58,20 @@ class OrdersRepository extends ServiceEntityRepository
         ;
     }
 
+    //search personal orders
+    public function personalOrderSearch($search, $user)
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.Registration', 'r')
+            ->leftJoin('r.Team', 't')
+            ->andWhere('t.User = :val')
+            ->setParameter('val', $user)
+            ->andWhere('o.OrderNumber LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->orderBy('o.createdAt', 'DESC')
+        ;
+    }
+
     /*
     public function findOneBySomeField($value): ?Orders
     {

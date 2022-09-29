@@ -168,10 +168,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     const ROLES = array(
-        'Super administrator' => 'ROLE_ADMIN',
-        'Administrator' => 'ROLE_SECRETARY',
-        'Scanner' => 'ROLE_SCANNER',
-        'Gebruiker' => 'ROLE_USER'
+        'Admin' => 'ROLE_ADMIN',
+        'Coach' => 'ROLE_USER'
     );
 
     public function isVerified(): bool

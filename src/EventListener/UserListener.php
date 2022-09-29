@@ -2,6 +2,8 @@
 
 namespace App\EventListener;
 
+use App\Entity\Orders;
+use App\Entity\Registrations;
 use App\Entity\User;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\Mailer\MailerInterface;
@@ -19,25 +21,28 @@ class UserListener
         $this->currUser = $user;
     }
 
-    public function postPersist(LifecycleEventArgs $args): void
+    public function postUpdate(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
 
-        if (!$entity instanceof User) {
+        if (!$entity instanceof Orders) {
             return;
         }
 
-        $email = (new Email())
-            ->from('info@nnks.nl')
-            ->to($entity->getEmail())
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('Nieuwe gebruiker bij NNKS.nl')
-            ->html('<p>Je bent aangemaakt als nieuwe gebruiker:</p><br />'.$entity->getEmail());
+        if($entity->getOrderStatus() == 'paid') {
 
-        $this->mailer->send($email);
+            $email = (new Email())
+                ->from('info@nnks.nl')
+                ->to($entity->getRegistration()->getTeam()->getMailTrainer())
+                //->cc('cc@example.com')
+                //->bcc('bcc@example.com')
+                //->replyTo('fabien@example.com')
+                //->priority(Email::PRIORITY_HIGH)
+                ->subject('Nieuwe betaling via NNKS manager')
+                ->html('Nieuwe betaling ontvangen voor team ' . $entity->getRegistration()->getTeam()->getName() . ' Bedrag ontvangen: €'. $entity->getAmount());
+
+            $this->mailer->send($email);
+        }
 
     }
 }

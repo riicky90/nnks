@@ -100,7 +100,6 @@ export default class extends Controller {
             });
 
             this.close();
-            // TODO: save ajax state for navigation to edited item
             this.dispatch('async:saved');
 
 

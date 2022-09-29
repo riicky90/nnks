@@ -175,19 +175,19 @@ class Registrations
         return count($this->Dancers);
     }
 
-    public function getTotalPayed()
+    public function getTotalpaid()
     {
         $orders = $this->getOrders();
 
-        $totalPayed = 0;
+        $totalpaid = 0;
 
         foreach ($orders as $order) {
-            if ($order->getOrderStatus() == 'payed') {
-                $totalPayed += $order->getAmount();
+            if ($order->getOrderStatus() == 'paid') {
+                $totalpaid += $order->getAmount();
             }
         }
 
-        return $totalPayed;
+        return $totalpaid;
     }
 
     public function getCreatedBy(): ?User

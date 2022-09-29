@@ -6,7 +6,7 @@ const toggleSidebar = (sidebarEl, expand, setExpanded = false) => {
     const mainContentEl = document.getElementById('main-content');
     if (expand) {
         sidebarEl.classList.add('lg:w-64');
-        sidebarEl.classList.remove('lg:w-16');
+        sidebarEl.classList.remove('lg:w-16', 'w-64');
         mainContentEl.classList.add('lg:ml-64');
         mainContentEl.classList.remove('lg:ml-16');
 

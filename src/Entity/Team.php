@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
@@ -45,6 +46,15 @@ class Team
     #[ORM\ManyToOne(inversedBy: 'teams')]
     #[Gedmo\Blameable(on: 'create')]
     private ?User $User = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $TrainerTel = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $TrainerBirthDay = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $TrainerLastname = null;
 
     public function __construct()
     {
@@ -189,6 +199,42 @@ class Team
     public function setUser(?User $User): self
     {
         $this->User = $User;
+
+        return $this;
+    }
+
+    public function getTrainerTel(): ?string
+    {
+        return $this->TrainerTel;
+    }
+
+    public function setTrainerTel(?string $TrainerTel): self
+    {
+        $this->TrainerTel = $TrainerTel;
+
+        return $this;
+    }
+
+    public function getTrainerBirthDay(): ?\DateTimeInterface
+    {
+        return $this->TrainerBirthDay;
+    }
+
+    public function setTrainerBirthDay(\DateTimeInterface $TrainerBirthDay): self
+    {
+        $this->TrainerBirthDay = $TrainerBirthDay;
+
+        return $this;
+    }
+
+    public function getTrainerLastname(): ?string
+    {
+        return $this->TrainerLastname;
+    }
+
+    public function setTrainerLastname(string $TrainerLastname): self
+    {
+        $this->TrainerLastname = $TrainerLastname;
 
         return $this;
     }

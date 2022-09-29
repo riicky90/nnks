@@ -26,14 +26,21 @@ class FeDancerController extends AbstractController
 {
 
     #[Route('/', name: 'fe_dancers_index')]
-    public function dancers(RegistrationsRepository $registrationsRepository, UserRepository $userRepository, DancersRepository $dancersRepository): Response
+    public function dancers(Request $request, DancersRepository $dancersRepository, PaginatorInterface $paginator): Response
     {
-        $userOrganisation = $userRepository->find($this->getUser())->getOrganisation();
+        $filter = $request->query->get('filter');
 
-        $dancers = $dancersRepository->findByUser($this->getUser());
+        $dancers = $dancersRepository->findByUser($this->getUser(), $filter);
+
+        $pagination = $paginator->paginate(
+            $dancers,
+            $request->query->getInt('page', 1),
+            12
+        );
 
         return $this->render('frontend/dancers/index.html.twig', [
-            'dancers' => $dancers,
+            'dancers' => $pagination,
+            'filter' => $filter,
         ]);
     }
 

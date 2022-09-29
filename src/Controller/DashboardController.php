@@ -41,7 +41,7 @@ class DashboardController extends AbstractController
             ],
         ]);
 
-        $orders = $ordersRepository->findBy(["OrderStatus" => "payed"], ["createdAt" => "ASC"], 10, 0);
+        $orders = $ordersRepository->findBy(["OrderStatus" => "paid"], ["createdAt" => "ASC"], 10, 0);
 
         return $this->render('dashboard/index.html.twig', [
             'chart' => $chart,

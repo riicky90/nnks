@@ -34,6 +34,9 @@ class Orders
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
     private $Amount;
 
+    #[ORM\Column(length: 255)]
+    private ?string $OrderId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +98,18 @@ class Orders
     public function setAmount(?string $Amount): self
     {
         $this->Amount = $Amount;
+
+        return $this;
+    }
+
+    public function getOrderId(): ?string
+    {
+        return $this->OrderId;
+    }
+
+    public function setOrderId(string $OrderId): self
+    {
+        $this->OrderId = $OrderId;
 
         return $this;
     }

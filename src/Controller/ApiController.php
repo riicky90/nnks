@@ -28,7 +28,6 @@ class ApiController extends AbstractController
                     'locationZipCode' => $contest->getLocationZipCode(),
                     'locationCity' => $contest->getLocationCity(),
                     'registrationFee' => $contest->getRegistrationFee(),
-                    'entranceFee' => $contest->getEntranceFee(),
                     'single_event_link' => '/contest/' . $contest->getId().'/'. $contest->getName(),
                     'disciplines' => json_encode($contest->getDisciplines()),
                     'organisation' => array([

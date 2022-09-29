@@ -3,13 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Orders;
-use App\Entity\Organisation;
-use App\Repository\ContestRepository;
 use App\Repository\OrdersRepository;
-use App\Repository\OrganisationRepository;
 use App\Repository\RegistrationsRepository;
-use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
+use Mollie\Api\MollieApiClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,49 +15,54 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Security;
 
 class PaymentController extends AbstractController
 {
-    private $mollie;
+    private MollieApiClient $mollie;
 
     public function __construct()
     {
-        $this->mollie = new \Mollie\Api\MollieApiClient;
+        $this->mollie = new MollieApiClient;
     }
 
-    #[Route('/frontend/paymentmethods')]
-    public function listPaymentOptions()
-    {
-        $payments = $this->mollie->payments->page();
-
-        dd($payments);
-    }
-
-    #[Route('/frontend/makepayment/{registration}/{amount}', name: "make_payment", methods: ['GET'])]
-    public function makePayment($registration, $amount, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager)
+    #[Route('/frontend/makepayment/{registration}', name: "make_payment", methods: ['GET'])]
+    public function makePayment($registration, RegistrationsRepository $registrationsRepository, OrdersRepository $ordersRepository, EntityManagerInterface $entityManager)
     {
         $registration = $registrationsRepository->find($registration);
-        $amountFormatted = number_format($amount, 2, '.', ',');
+
+        $paidOrders = $ordersRepository->findBy(['Registration' => $registration, 'OrderStatus' => 'paid']);
+        $paidAmount = 0;
+        foreach ($paidOrders as $paidOrder) {
+            $paidAmount += $paidOrder->getAmount();
+        }
+
+        $dancers = $registration->getDancers()->count();
+        $amount = $dancers * $registration->getContest()->getRegistrationFee() - $paidAmount;
+        $amount = number_format($amount, 2, '.', '');
 
         $this->mollie->setApiKey($registration->getContest()->getOrganisation()->getMollieApiKey());
 
+        $orderId = time().mt_rand();
 
         $payment = $this->mollie->payments->create([
             "amount" => [
                 "currency" => "EUR",
-                "value" => $amountFormatted
+                "value" => $amount
             ],
-            "description" => "Order #1234",
-            "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => "1234"], UrlGeneratorInterface::ABSOLUTE_URL),
-            "webhookUrl" => ""
+            "description" => "Order #" . $orderId . ". Wedstrijd: " . $registration->getContest()->getName(),
+            "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => $orderId], UrlGeneratorInterface::ABSOLUTE_URL),
+            "metadata" => [
+                "order_id" => "#" . $orderId,
+                "team" => $registration->getTeam()->getName(),
+            ],
+            "webhookUrl" => $this->generateUrl('mollie_webhook', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
 
         $order = new Orders();
-
-        $order->setOrderStatus("pending");
-        $order->setOrderNumber("1234");
-        $order->setAmount($amountFormatted);
+        $order->setOrderStatus($payment->status);
+        $order->setOrderNumber($payment->id);
+        $order->setOrderId($orderId);
+        $order->setAmount($amount);
         $order->setRegistration($registrationsRepository->find($registration));
         $entityManager->persist($order);
         $entityManager->flush();
@@ -70,77 +72,71 @@ class PaymentController extends AbstractController
     }
 
     #[Route('frontend/payment/result/{orderid}', name: "payment_result")]
-    public function paymentResult($orderid, OrdersRepository $ordersRepository, EntityManagerInterface $entityManager)
+    public function paymentResult($orderid, OrdersRepository $ordersRepository, TicketsController $ticketsController, EntityManagerInterface $entityManager): Response
     {
-        try {
-            $this->mollie->setApiKey($this->getUser()->getOrganisation()->getMollieApiKey());
+        $order = $ordersRepository->findOneBy(["OrderId" => $orderid]);
 
-            $payment = $this->mollie->orders->get($orderid);
+        $this->mollie->setApiKey($order->getRegistration()->getContest()->getOrganisation()->getMollieApiKey());
 
-            if ($payment->status == "completed") {
-                $order = $ordersRepository->findOneBy(['OrderNumber' => $orderid]);
-                $order->setOrderStatus("payed");
-                $entityManager->flush();
-            } else {
-                $order = $ordersRepository->findOneBy(['OrderNumber' => $orderid]);
-                $order->setOrderStatus("failed");
-                $entityManager->flush();
-            }
+        $payment = $this->mollie->payments->get($order->getOrderNumber());
 
-            return $this->render('frontend/orders/status.html.twig', [
-                'payment' => $payment,
-            ]);
-        } catch (\Exception $e) {
-
-            $error = [
-                "status" => "error",
-                "message" => $e->getMessage()
-            ];
-
-            return $this->render('frontend/orders/status.html.twig', [
-                'payment' => $error,
-            ]);
+        if($payment->isPaid())
+        {
+            $order->setOrderStatus("paid");
+            $entityManager->persist($order);
+            $entityManager->flush();
         }
 
 
+        return $this->render('frontend/orders/status.html.twig', [
+            'payment' => $payment,
+            'order' => $order
+        ]);
+
     }
 
-    #[Route('/createpaymentlink', methods: ['POST'], name: "create_payment_link")]
-    public function createPaymentLink(Request $request, RegistrationsRepository $registrationsRepository, MailerInterface $mailer)
+    #[Route('/createpaymentlink/{registration}', name: "create_payment_link", methods: ['GET'])]
+    public function createPaymentLink(Request $request, $registration, OrdersRepository $ordersRepository, RegistrationsRepository $registrationsRepository, MailerInterface $mailer)
     {
+        $registration = $registrationsRepository->find($registration);
 
-        $method = $request->get('method');
-        $amount = $request->get('amount');
-        $orderID = $request->get('orderid');
-        $registration = $request->get('registration');
+        $paidOrders = $ordersRepository->findBy(['Registration' => $registration, 'OrderStatus' => 'paid']);
+        $paidAmount = 0;
+        foreach ($paidOrders as $paidOrder) {
+            $paidAmount += $paidOrder->getAmount();
+        }
 
-        $currRegistration = $registrationsRepository->find($registration);
+        $dancers = $registration->getDancers()->count();
+        $amount = $dancers * $registration->getContest()->getRegistrationFee() - $paidAmount;
+        $amount = number_format($amount, 2, '.', '');
 
-        $this->mollie->setApiKey($currRegistration->getTeam()->getOrganisation()->getMollieApiKey());
+        $this->mollie->setApiKey($registration->getContest()->getOrganisation()->getMollieApiKey());
+
+        $orderId = time().mt_rand();
 
         $payment = $this->mollie->paymentLinks->create([
             "amount" => [
                 "currency" => "EUR",
-                "value" => number_format($amount, 2, '.', '')
+                "value" => $amount
             ],
-            "description" => "Order #{$orderID}",
-            "webhookUrl" => "http://alphaproducties.nl/"
-
+            "description" => "Order #" . $orderId . ". Wedstrijd: " . $registration->getContest()->getName(),
+            "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => $orderId], UrlGeneratorInterface::ABSOLUTE_URL),
+            "webhookUrl" => $this->generateUrl('mollie_webhook', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
 
         $email = (new Email())
             ->from('info@nnks.nl')
-            ->to($currRegistration->getTeam()->getMailTrainer())
+            ->to($registration->getTeam()->getMailTrainer())
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject("Betaal verzoek inschrijving voor {$currRegistration->getContest()->getName()} op NNKS.nl")
-            ->html("Hallo {$currRegistration->getTeam()->getTrainerName()},<p>Hierbij ontvang je een betaal verzoek voor de inschrijving {$currRegistration->getContest()->getName()} met team {$currRegistration->getTeam()->getName()} </p><p><a href='{$payment->getCheckoutUrl()}'>Betalen</a></p>");
+            ->subject("Betaal verzoek inschrijving voor {$registration->getContest()->getName()} op NNKS.nl")
+            ->html("Hallo {$registration->getTeam()->getTrainerName()},<p>Hierbij ontvang je een betaal verzoek voor de inschrijving {$registration->getContest()->getName()} met team {$registration->getTeam()->getName()} </p><p><a href='{$payment->getCheckoutUrl()}'>Betalen</a></p>");
 
         try {
 
             $mailer->send($email);
-            $this->addFlash("success", "E-mail met betaallink is verzonden naar: {$currRegistration->getTeam()->getMailTrainer()} ");
+            $this->addFlash("success", "E-mail met betaallink is verzonden naar: {$registration->getTeam()->getMailTrainer()} ");
 
         } catch (TransportExceptionInterface $e) {
             $this->addFlash('error', 'E-mail is kon niet worden verstuurd');
@@ -150,4 +146,25 @@ class PaymentController extends AbstractController
 
     }
 
+    #[Route('/mollie-webhook', name: "mollie_webhook")]
+    public function webhook(Request $request, OrdersRepository $ordersRepository, EntityManagerInterface $entityManager)
+    {
+        $paymentID = $request->get('id');
+
+        $order = $ordersRepository->findOneBy(["OrderNumber" => $paymentID]);
+        $organisation = $order->getRegistration()->getContest()->getOrganisation();
+
+        $this->mollie->setApiKey($organisation->getMollieApiKey());
+
+        $payment = $this->mollie->payments->get($request->get('id'));
+
+        if($payment->isPaid())
+        {
+            $order->setOrderStatus("paid");
+            $entityManager->persist($order);
+            $entityManager->flush();
+        }
+
+        return new Response("OK", 200);
+    }
 }

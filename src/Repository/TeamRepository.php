@@ -95,6 +95,21 @@ class TeamRepository extends ServiceEntityRepository
         $qb->leftJoin('t.Category', 'c');
         $qb->where('t.Name LIKE :search OR t.MailTrainer LIKE :search OR t.TrainerName LIKE :search OR u.DansSchool LIKE :search OR c.Name LIKE :search');
         $qb->setParameter('search', '%'.$search.'%');
+
+        return $qb->getQuery();
+    }
+
+    public function searchPersonal($search, $user)
+    {
+        $qb = $this->createQueryBuilder('t');
+        $qb->leftJoin('t.User', 'u');
+        $qb->leftJoin('t.Category', 'c');
+        $qb->andWhere('t.Name LIKE :search OR t.MailTrainer LIKE :search OR t.TrainerName LIKE :search OR u.DansSchool LIKE :search OR c.Name LIKE :search');
+        $qb->andWhere('t.User = :user');
+        $qb->setParameter('search', '%'.$search.'%');
+        $qb->setParameter('user', $user);
+        $qb->orderBy('t.id', 'ASC');
+
         return $qb->getQuery();
     }
 

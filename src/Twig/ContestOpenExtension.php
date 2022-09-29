@@ -30,7 +30,7 @@ class ContestOpenExtension extends AbstractExtension
     {
         return [
             new TwigFunction('contestOpen', [$this, 'contestOpen']),
-            new TwigFunction('registrationPayed', [$this, 'registrationPayed'])
+            new TwigFunction('registrationpaid', [$this, 'registrationpaid'])
         ];
     }
 
@@ -50,24 +50,24 @@ class ContestOpenExtension extends AbstractExtension
 
     }
 
-    public function registrationPayed(int $registration): bool
+    public function registrationpaid(int $registration): bool
     {
         $registration = $this->registrationRepository->find($registration);
         $dancers = count($registration->getDancers());
         $totalDue = $dancers * $registration->getContest()->getRegistrationFee();
 
-        //sum total orders that are payed for this contest
-        $totalPayed = 0;
+        //sum total orders that are paid for this contest
+        $totalpaid = 0;
         foreach ($registration->getOrders() as $order) {
-            if ($order->getOrderStatus() == "payed") {
-                $totalPayed += $order->getAmount();
+            if ($order->getOrderStatus() == "paid") {
+                $totalpaid += $order->getAmount();
             }
         }
 
         $totalDue = number_format($totalDue, 2, '.', '');
-        $totalPayed = number_format($totalPayed, 2, '.', '');
+        $totalpaid = number_format($totalpaid, 2, '.', '');
 
-        if($totalDue == $totalPayed || $totalPayed > $totalDue){
+        if($totalpaid >= $totalDue){
             return false;
         }else {
             return true;

@@ -27,22 +27,20 @@ class FeTeamController extends AbstractController
     #[Route('/', name: 'fe_team_index')]
     public function index(TeamRepository $teamRepository, Request $request, PaginatorInterface $paginator, UserRepository $userRepository, ContestRepository $contestRepository, DancersRepository $dancersRepository, OrganisationRepository $organisationRepository, RegistrationsRepository $registrationsRepository)
     {
-        $userOrganisation = $userRepository->find($this->getUser())->getOrganisation();
-        $q = $request->query->get('q');
+        $filter = $request->query->get('filter');
 
-        $teams = $teamRepository->searchPersonalTeam($userOrganisation, $q);
-
-
+        $teams = $teamRepository->searchPersonal($filter, $this->getUser());
 
         $pagination = $paginator->paginate(
             $teams,
             $request->query->getInt('page', 1),
-            10
+            12
         );
 
         $contests = $contestRepository->allOpenContests();
 
         return $this->render('frontend/team/index.html.twig', [
+            "filter" => $filter,
             "teams" => $pagination,
             "contests" => $contests,
         ]);

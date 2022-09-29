@@ -51,6 +51,12 @@ class OrganisationType extends AbstractType
                     'placeholder' => 'Telefoonnummer van de organisatie',
                 ]
             ])
+            ->add('Description', null, [
+                'label' => 'Bechrijving dansschool',
+                'attr' => [
+                    'placeholder' => 'Beschrijving van de dansschool',
+                ]
+            ])
             ->add('MollieApiKey', null, [
                 'label' => 'Mollie API Sleutel',
                 'attr' => [

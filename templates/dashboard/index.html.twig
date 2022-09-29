@@ -30,7 +30,7 @@
                                             Ordernummer
                                         </th>
                                         <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Datum/tijd
+                                            Status
                                         </th>
                                         <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Bedrag
@@ -44,7 +44,7 @@
                                             {{ order.orderNumber }}
                                         </td>
                                         <td class="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                            {{ order.createdAt|date('d-m-Y H:i:s') }}
+                                            {{ order.orderStatus }}
                                         </td>
                                         <td class="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                             {{ order.amount }}
