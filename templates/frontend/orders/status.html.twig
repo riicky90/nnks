@@ -4,7 +4,7 @@
         margin: 0 auto;
     }
 </style>
-{% if payment.status == "paid" %}
+{% if order.orderStatus == "paid" %}
 
     <div class="flex justify-center w-full min-h-screen">
         <div class="text-center shadow-lg p-6 w-1/2">
@@ -14,7 +14,7 @@
                            autoplay></lottie-player>
             <h1 class="text-black-500 text-2xl text-center">Je inschrijving is betaald.</h1>
             <ul class="list-none mt-6 text-center">
-                <li class="text-black-500 text-xl">Order nummer: {{ payment.id }}</li>
+                <li class="text-black-500 text-xl">Order nummer: {{ order.orderNumber }}</li>
                 <li class="text-black-500 text-xl">Bedrag: €{{ order.amount }}</li>
                 <li class="text-black-500 text-xl">Team: {{ order.registration.team.name }}</li>
             </ul>
@@ -36,6 +36,8 @@
             <div class="mt-6">
                 <div class="text-center mt-16">
                     <a href="{{ payment.checkoutUrl }}" class="p-3 text-white rounded bg-cyan-600 hover:bg-cyan-700">Probeer opnieuw</a>
+                    <a href="{{ path('fe_registrations_index') }}" class="p-3 text-white rounded bg-cyan-600 hover:bg-cyan-700">Terug naar inschrijvingen</a>
+
                 </div>
             </div>
         </div>

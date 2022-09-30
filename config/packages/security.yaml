@@ -40,7 +40,7 @@ security:
       - { path: ^/mollie-webhook, roles: PUBLIC_ACCESS }
       - { path: ^/eventscan/scan, roles: [ROLE_ADMIN, ROLE_SCANNER] }
       - { path: ^/verify/email, roles: PUBLIC_ACCESS }
-      - { path: ^/api/contests, roles: PUBLIC_ACCESS }
+      - { path: ^/api, roles: PUBLIC_ACCESS }
       - { path: ^/logout, roles: PUBLIC_ACCESS }
       - { path: ^/register, roles: PUBLIC_ACCESS }
       - { path: ^/frontend, roles: ROLE_USER }

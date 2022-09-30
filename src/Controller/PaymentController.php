@@ -78,7 +78,14 @@ class PaymentController extends AbstractController
 
         $this->mollie->setApiKey($order->getRegistration()->getContest()->getOrganisation()->getMollieApiKey());
 
-        $payment = $this->mollie->payments->get($order->getOrderNumber());
+        if(str_starts_with($order->getOrderNumber(), 'pl_'))
+        {
+            $payment = $this->mollie->paymentLinks->get($order->getOrderNumber());
+        }else{
+            $payment = $this->mollie->payments->get($order->getOrderNumber());
+        }
+
+
 
         if($payment->isPaid())
         {
@@ -96,7 +103,7 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/createpaymentlink/{registration}', name: "create_payment_link", methods: ['GET'])]
-    public function createPaymentLink(Request $request, $registration, OrdersRepository $ordersRepository, RegistrationsRepository $registrationsRepository, MailerInterface $mailer)
+    public function createPaymentLink(Request $request, $registration, EntityManagerInterface $entityManager, OrdersRepository $ordersRepository, RegistrationsRepository $registrationsRepository, MailerInterface $mailer)
     {
         $registration = $registrationsRepository->find($registration);
 
@@ -114,6 +121,8 @@ class PaymentController extends AbstractController
 
         $orderId = time().mt_rand();
 
+        $amount = "0.10";
+
         $payment = $this->mollie->paymentLinks->create([
             "amount" => [
                 "currency" => "EUR",
@@ -123,6 +132,15 @@ class PaymentController extends AbstractController
             "redirectUrl" => $this->generateUrl('payment_result', ["orderid" => $orderId], UrlGeneratorInterface::ABSOLUTE_URL),
             "webhookUrl" => $this->generateUrl('mollie_webhook', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
+
+        $order = new Orders();
+        $order->setOrderStatus('open');
+        $order->setOrderNumber($payment->id);
+        $order->setOrderId($orderId);
+        $order->setAmount($amount);
+        $order->setRegistration($registrationsRepository->find($registration));
+        $entityManager->persist($order);
+        $entityManager->flush();
 
         $email = (new Email())
             ->from('info@nnks.nl')

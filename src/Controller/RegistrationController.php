@@ -56,7 +56,7 @@ class RegistrationController extends AbstractController
                 (new TemplatedEmail())
                     ->from(new Address('info@nnks.nl', 'NNKS Manager'))
                     ->to($user->getEmail())
-                    ->subject('Please Confirm your Email')
+                    ->subject('NNKS Bevestig je e-mailadres')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 

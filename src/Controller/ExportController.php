@@ -33,6 +33,7 @@ class ExportController extends AbstractController
         $sheet->setCellValue('H1', 'Dansschool');
         $sheet->setCellValue('I1', 'Aantal dansers');
         $sheet->setCellValue('J1', 'Dansers');
+        $sheet->setCellValue('K1', 'Muziek bestand');
 
         $registrations = $registrationsRepository->findBy(['Contest' => $contest]);
 
@@ -51,13 +52,16 @@ class ExportController extends AbstractController
             foreach ($item->getDancers() as $dancer) {
                 $dancers .= $dancer->getFirstName() . ' ' . $dancer->getLastName() . ' ' . $dancer->getBirthDay()->format('d-m-Y') . ', ';
             }
-            $sheet->setCellValue('I' . $count, $dancers);
+            $sheet->setCellValue('J' . $count, $dancers);
+            $sheet->setCellValue('K' . $count, $item->getMusicFile());
+
             $count++;
         }
+        $date = new \DateTime();
 
         $writer = new Xls($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="registraties-'.$registrations[0]->getContest()->getName().'.xls"');
+        header('Content-Disposition: attachment;filename="registraties-' . $date->format('d-m-Y H:i:s') . '.xls"');
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
     }
@@ -80,5 +84,36 @@ class ExportController extends AbstractController
         return $this->renderForm('registrations/_export.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    //route to export all music files for a contest in zip file
+    #[Route('/exportMusic/{contest}', name: 'export_music')]
+    public function exportMusic(Request $request, RegistrationsRepository $registrationsRepository, $contest)
+    {
+        //add all music file for this contest to zip file
+        $registrations = $registrationsRepository->findBy(['Contest' => $contest]);
+        $zip = new \ZipArchive();
+        $zipName = 'muziekbestanden' . '.zip';
+        $zip->open($zipName, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        foreach ($registrations as $item) {
+            if ($item->getMusicFile() != null) {
+                $publicDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/music/';
+                $zip->addFile($publicDirectory . $item->getMusicFile(), $item->getMusicFile());
+            }
+        }
+        $zip->close();
+
+        //send zip file to browser
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $zipName . '"');
+        $response->headers->set('Content-length', filesize($zipName));
+        $response->sendHeaders();
+        $response->setContent(readfile($zipName));
+
+        unlink($zipName);
+
+        return $response;
+
     }
 }
