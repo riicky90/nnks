@@ -19,51 +19,14 @@ class RegistrationEventListener
 
     public function postUpdate(LifecycleEventArgs $args): void
     {
-        $entity = $args->getObject();
-
-        if(!$args->getObject() instanceof Registrations) {
-            return;
-        }
-
-        $em = $args->getObjectManager();
-
-        // Create a new Gemdo log entry
-        $logEntry = new LogEntry();
-        $logEntry->setAction('update');
-        $logEntry->setLoggedAt();
-        $logEntry->setObjectId($entity->getId());
-        $logEntry->setObjectClass($em->getClassMetadata(get_class($entity))->getName());
-        $logEntry->setVersion(time());
-        $logEntry->setData($entity->getDancers());
-        $logEntry->setUsername($this->security->getUser()->getEmail());
-
-        $em->persist($logEntry);
-        $em->flush();
 
     }
 
-    //pre persist
     public function postPersist(LifecycleEventArgs $args): void
     {
-        $entity = $args->getObject();
 
-        if(!$args->getObject() instanceof Registrations) {
-            return;
-        }
 
-        $em = $args->getObjectManager();
-
-        // Create a new Gemdo log entry
-        $logEntry = new LogEntry();
-        $logEntry->setAction('create');
-        $logEntry->setLoggedAt();
-        $logEntry->setObjectId($entity->getId());
-        $logEntry->setObjectClass($em->getClassMetadata(get_class($entity))->getName());
-        $logEntry->setVersion(time());
-        $logEntry->setData($entity->getDancers());
-        $logEntry->setUsername($this->security->getUser()->getEmail());
-
-        $em->persist($logEntry);
-        $em->flush();
     }
+
+
 }

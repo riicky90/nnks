@@ -74,8 +74,13 @@
                                 </table>
                                 <!-- button aligned right -->
                                 <div class="flex justify-end">
-                                    <button id="pay-button"
+                                    <button id="save-button-last"
                                             class="mt-4 mr-4 text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-5 py-4 text-center"
+                                            type="submit">
+                                        Opslaan
+                                    </button>
+                                    <button id="pay-button"
+                                            class="mt-4 text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm inline-flex items-center px-5 py-4 text-center"
                                             type="submit">
                                         Afrekenen
                                     </button>
@@ -120,15 +125,42 @@
             document.getElementById('total_dancers').innerHTML = dancers_count;
             document.getElementById('grand_total').innerHTML = total.toFixed(2);
 
-            document.getElementById('save-button').addEventListener('click', function () {
-                document.querySelectorAll('[name="registrations"]')[0].submit();
+            document.getElementById('save-button').addEventListener('click', function (e) {
+                if (document.getElementsByName('registrations')[0].checkValidity()) {
+                    e.preventDefault();
+                    document.getElementsByName('registrations')[0].submit();
+                    window.location.href = '{{ path('fe_registrations_index') }}';
+                } else {
+                    document.getElementsByName('registrations')[0].reportValidity();
+                }
+            });
+
+            document.getElementById('save-button-last').addEventListener('click', function (e) {
+                if (document.getElementsByName('registrations')[0].checkValidity()) {
+
+                    const form = document.getElementsByName('registrations')[0];
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'save';
+                    input.value = 'save';
+                    form.appendChild(input);
+
+                    form.submit();
+
+                } else {
+                    document.getElementsByName('registrations')[0].reportValidity();
+                }
             });
 
             document.getElementById('pay-button').addEventListener('click', function () {
-
-                document.querySelectorAll('[name="registrations"]')[0].submit();
-
+                if (document.getElementsByName('registrations')[0].checkValidity()) {
+                    document.getElementsByName('registrations')[0].submit();
+                } else {
+                    document.getElementsByName('registrations')[0].reportValidity();
+                }
             });
+
         }
     </script>
 {% endblock %}

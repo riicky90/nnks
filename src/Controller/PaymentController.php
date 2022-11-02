@@ -121,8 +121,6 @@ class PaymentController extends AbstractController
 
         $orderId = time().mt_rand();
 
-        $amount = "0.10";
-
         $payment = $this->mollie->paymentLinks->create([
             "amount" => [
                 "currency" => "EUR",

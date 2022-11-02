@@ -87,6 +87,11 @@ class FeRegistrationController extends AbstractController
                 $amountpaid += $order->getAmount();
             }
 
+            if($request->request->get('save')) {
+                $this->addFlash('success', 'Inschrijving opgeslagen.');
+               return $this->redirectToRoute('fe_registrations_index');
+            }
+
             if ($amountpaid < $amount) {
                 return $this->redirectToRoute("make_payment",
                     [
@@ -115,6 +120,8 @@ class FeRegistrationController extends AbstractController
         $form = $this->createForm(RegistrationsType::class, $registration,
             [
                 'register' => true,
+                "edit-page" => true,
+                "contest" => $curr->getContest(),
                 'action' => $this->generateUrl('fe_registration_edit', ['registration' => $registration->getId()]),
             ]
         );
@@ -148,6 +155,10 @@ class FeRegistrationController extends AbstractController
                 $amountpaid += $order->getAmount();
             }
 
+            if($request->request->get('save')) {
+                $this->addFlash('success', 'Inschrijving opgeslagen.');
+                return $this->redirectToRoute('fe_registrations_index');
+            }
 
             if ($amountpaid < $amount) {
                 return $this->redirectToRoute("make_payment",
@@ -164,9 +175,11 @@ class FeRegistrationController extends AbstractController
         $orders = $ordersRepository->findBy(['Registration' => $curr->getId(), 'OrderStatus' => 'paid']);
 
         $amountpaid = 0;
+
         foreach ($orders as $order) {
             $amountpaid += $order->getAmount();
         }
+
         return $this->render('frontend/registrations/edit.html.twig', [
             'registration' => $registration,
             'totalpaid' => $amountpaid,

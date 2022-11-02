@@ -73,6 +73,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $qb->andWhere('u.email LIKE :val OR o.Name LIKE :val')
                 ->setParameter('val', '%'.$query.'%');
         }
+        $qb->orderBy('u.id', 'ASC');
         return $qb->getQuery();
     }
 }

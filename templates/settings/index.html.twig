@@ -41,24 +41,5 @@
             </div>
         </div>
     </div>
-    <div class="card mb-4 xl:mb-0">
-        <div class="flow-root">
-            <h3 class="text-xl font-bold">Instellingen voor notificaties</h3>
-            <div class="divide-y divide-gray-200">
-                <!-- Item 1 -->
-                <div class="flex items-center justify-evenly py-4">
-                    <div class="flex-grow flex flex-col">
-                        <div class="text-lg font-semibold text-gray-900">E-mail bij nieuwe inschrijving</div>
-                        <div class="text-base font-normal text-gray-500 ">Ontvang een e-mail bij een nieuwe inschrijving</div>
-                    </div>
-                    <label for="company-news" class="flex items-center cursor-pointer relative">
-                        <input type="checkbox" id="company-news" class="sr-only" data-action="update-setting#toggle" data-update-setting-setting-param="notify_new_registration" data-update-setting-url-param="{{ path('settings_edit') }}" {% if craue_setting('notify_new_registration') %} checked{% endif %}>
-                        <span class="toggle-bg bg-gray-200 border-2 border-gray-200 h-6 w-11 rounded-full"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 {% endblock %}

@@ -16,7 +16,7 @@ class ApiController extends AbstractController
         $contests = $contestRepository->allOpenContests();
         $items_json = [];
         foreach ($contests as $contest) {
-            $items_json = array([
+            $items_json[] = array(
                     'id' => $contest->getId(),
                     'name' => $contest->getName(),
                     'start' => $contest->getDate()->format('Y-m-d H:i:s'),
@@ -39,13 +39,12 @@ class ApiController extends AbstractController
                         'zipCode' => $contest->getOrganisation()->getZipCode(),
                         'city' => $contest->getOrganisation()->getCity(),
                     ),
-            ]);
+            );
         }
 
         $info = [
             'total' => count($contests),
             'items' => $items_json,
-
         ];
 
         return $this->json($info);

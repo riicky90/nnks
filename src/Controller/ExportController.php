@@ -34,28 +34,51 @@ class ExportController extends AbstractController
         $sheet->setCellValue('I1', 'Aantal dansers');
         $sheet->setCellValue('J1', 'Dansers');
         $sheet->setCellValue('K1', 'Muziek bestand');
+        $sheet->setCellValue('L1', 'Team categorie');
+        $sheet->setCellValue('M1', 'Ingeschreven door');
+        $sheet->setCellValue('N1', 'Opmerkingen');
+        $sheet->setCellValue('O1', 'Trainer telefoon nummer');
+        $sheet->setCellValue('P1', 'Dansschool');
+        $sheet->setCellValue('Q1', 'Bedrag betaald');
 
         $registrations = $registrationsRepository->findBy(['Contest' => $contest]);
 
         $count = 2;
         foreach ($registrations as $item) {
-            $sheet->setCellValue('A' . $count, $item->getId());
-            $sheet->setCellValue('B' . $count, $item->getContest()->getName());
-            $sheet->setCellValue('C' . $count, $item->getContest()->getDate()->format('d-m-Y'));
-            $sheet->setCellValue('D' . $count, $item->getContest()->getOrganisation()->getName());
-            $sheet->setCellValue('E' . $count, $item->getTeam()->getName());
-            $sheet->setCellValue('F' . $count, $item->getTeam()->getTrainerName());
-            $sheet->setCellValue('G' . $count, $item->getTeam()->getMailTrainer());
-            $sheet->setCellValue('H' . $count, $item->getTeam()->getUser()->getDansSchool());
-            $sheet->setCellValue('I' . $count, count($item->getDancers()));
-            $dancers = '';
-            foreach ($item->getDancers() as $dancer) {
-                $dancers .= $dancer->getFirstName() . ' ' . $dancer->getLastName() . ' ' . $dancer->getBirthDay()->format('d-m-Y') . ', ';
+            $totalAmountPaid = 0;
+            foreach ($item->getOrders() as $order) {
+                if ($order->getOrderStatus() == 'paid') {
+                    $totalAmountPaid += $order->getAmount();
+                }
             }
-            $sheet->setCellValue('J' . $count, $dancers);
-            $sheet->setCellValue('K' . $count, $item->getMusicFile());
+            $grandTotal = $item->getContest()->getRegistrationFee() * $item->getDancers()->count();
 
-            $count++;
+            if ($totalAmountPaid >= $grandTotal) {
+
+                $sheet->setCellValue('A' . $count, $item->getId());
+                $sheet->setCellValue('B' . $count, $item->getContest()->getName());
+                $sheet->setCellValue('C' . $count, $item->getContest()->getDate()->format('d-m-Y'));
+                $sheet->setCellValue('D' . $count, $item->getContest()->getOrganisation()->getName());
+                $sheet->setCellValue('E' . $count, $item->getTeam()->getName());
+                $sheet->setCellValue('F' . $count, $item->getTeam()->getTrainerName());
+                $sheet->setCellValue('G' . $count, $item->getTeam()->getMailTrainer());
+                $sheet->setCellValue('H' . $count, $item->getTeam()->getUser()->getDansSchool());
+                $sheet->setCellValue('I' . $count, count($item->getDancers()));
+                $dancers = '';
+                foreach ($item->getDancers() as $dancer) {
+                    $dancers .= $dancer->getFirstName() . ' ' . $dancer->getLastName() . ' ' . $dancer->getBirthDay()->format('d-m-Y') . ', ';
+                }
+                $sheet->setCellValue('J' . $count, $dancers);
+                $sheet->setCellValue('K' . $count, $item->getMusicFile());
+                $sheet->setCellValue('L' . $count, $item->getTeam()->getCategory());
+                $sheet->setCellValue('M' . $count, $item->getCreatedBy()->getEmail());
+                $sheet->setCellValue('N' . $count, $item->getComments());
+                $sheet->setCellValue('O' . $count, $item->getTeam()->getTrainerTel());
+                $sheet->setCellValue('P' . $count, $item->getCreatedBy()->getDansSchool());
+                $sheet->setCellValue('Q' . $count, $totalAmountPaid);
+
+                $count++;
+            }
         }
         $date = new \DateTime();
 

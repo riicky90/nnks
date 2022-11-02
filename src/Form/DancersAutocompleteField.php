@@ -23,7 +23,7 @@ class DancersAutocompleteField extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        if(in_array('ROLE_ADMIN', $this->user->getRoles())){
+        if(in_array('ROLE_ADMIN', $this->user->getRoles())) {
             $resolver->setDefaults([
                 'class' => Dancers::class,
                 'placeholder' => 'Kies dansers',
@@ -32,10 +32,12 @@ class DancersAutocompleteField extends AbstractType
                 'query_builder' => function (DancersRepository $dancersRepository) {
                     return $dancersRepository->createQueryBuilder('d')
                         ->orderBy('d.FirstName', 'ASC')
-                        ->leftJoin('d.team', 't');
+                        ->leftJoin('d.team', 't')
+                        ->andWhere('t.User = :user')
+                        ->setParameter('user', $this->user);
                 },
             ]);
-        }else {
+        } else {
             $resolver->setDefaults([
                 'class' => Dancers::class,
                 'placeholder' => 'Kies dansers',

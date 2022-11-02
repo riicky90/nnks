@@ -95,6 +95,7 @@ class RegistrationsType extends AbstractType
             'current_id' => null,
             'contest' => null,
             'edit' => false,
+            'edit-page' => false,
         ]);
     }
 
@@ -105,6 +106,9 @@ class RegistrationsType extends AbstractType
      */
     public function getFormBuilder(FormBuilderInterface $builder, array $options): void
     {
+        if($options["edit-page"]) {
+            return;
+        }
         $builder->add('Team', EntityType::class, [
             'class' => Team::class,
             'choice_label' => 'Name',
@@ -123,7 +127,6 @@ class RegistrationsType extends AbstractType
                                 ->where('tr.Contest = :contest')
                                 ->getDQL()
                         )
-
                     );
                     $qb->andWhere('t.User = :user');
                     $qb->setParameter('user', $this->security->getUser());
