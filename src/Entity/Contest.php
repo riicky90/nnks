@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ContestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContestRepository::class)]
@@ -54,6 +55,9 @@ class Contest
 
     #[ORM\Column(length: 255)]
     private ?string $LocationCity = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $RegistrationOpenFrom = null;
 
     public function __construct()
     {
@@ -266,6 +270,18 @@ class Contest
     public function setLocationCity(string $LocationCity): self
     {
         $this->LocationCity = $LocationCity;
+
+        return $this;
+    }
+
+    public function getRegistrationOpenFrom(): ?\DateTimeInterface
+    {
+        return $this->RegistrationOpenFrom;
+    }
+
+    public function setRegistrationOpenFrom(\DateTimeInterface $RegistrationOpenFrom): self
+    {
+        $this->RegistrationOpenFrom = $RegistrationOpenFrom;
 
         return $this;
     }

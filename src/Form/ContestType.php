@@ -78,9 +78,17 @@ class ContestType extends AbstractType
             ])
             ->add('RegistrationFee', null, [
                 'label' => 'Inschrijfgeld'
+            ])->add('RegistrationOpenFrom', DateType::class, [
+                'label' => 'Inschrijving open vanaf',
+                'widget' => 'single_text',
+                'attr' => [
+                    'data-stripe' => '',
+                    'placeholder' => 'Datum start inschrijvingen',
+                ],
             ])->add('Enabled', CheckboxType::class, [
                 'label' => 'Wedstrijd publiceren'
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

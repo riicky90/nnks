@@ -13,13 +13,19 @@ class ApiController extends AbstractController
     #[Route('/contests', name: 'api_contests_index', methods: ['GET'])]
     public function index(ContestRepository $contestRepository): Response
     {
-        $contests = $contestRepository->allOpenContests();
+        $contests = $contestRepository->allOpenContestsApi();
         $items_json = [];
         foreach ($contests as $contest) {
+            $regOpen = false;
+            if ($contest->getRegistrationOpenFrom() <= new \DateTime()) {
+                $regOpen = true;
+            }
             $items_json[] = array(
                     'id' => $contest->getId(),
                     'name' => $contest->getName(),
                     'start' => $contest->getDate()->format('Y-m-d H:i:s'),
+                    'registrationOpen' => $regOpen,
+                    'registrationOpenFrom' => $contest->getRegistrationOpenFrom()->format('d-m-Y'),
                     'description' => $contest->getDescription(),
                     'enabled' => $contest->getEnabled(),
                     'location' => $contest->getLocation(),

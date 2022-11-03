@@ -48,6 +48,11 @@ class FeRegistrationController extends AbstractController
     {
         $contest = $contestRepository->find($contest);
 
+        if($contest->getRegistrationOpenFrom() >= new \DateTime()){
+            $this->addFlash('success', 'Registratie voor dit event is nog niet mogelijk');
+            return $this->redirectToRoute('fe_contests_index');
+        }
+
         $registrations = new Registrations();
         $form = $this->createForm(RegistrationsType::class, $registrations,
             [
