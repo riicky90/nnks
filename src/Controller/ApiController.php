@@ -61,12 +61,17 @@ class ApiController extends AbstractController
     public function show(ContestRepository $contestRepository, $id): Response
     {
         $contest = $contestRepository->find($id);
-
+        $regOpen = false;
+        if ($contest->getRegistrationOpenFrom() <= new \DateTime()) {
+            $regOpen = true;
+        }
         $item_json =
             [
                 'id' => $contest->getId(),
                 'name' => $contest->getName(),
                 'start' => $contest->getDate()->format('Y-m-d H:i:s'),
+                'registrationOpen' => $regOpen,
+                'registrationOpenFrom' => $contest->getRegistrationOpenFrom()->format('d-m-Y'),
                 'description' => $contest->getDescription(),
                 'enabled' => $contest->getEnabled(),
                 'location' => $contest->getLocation(),
