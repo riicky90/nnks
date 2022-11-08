@@ -5,18 +5,30 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Security\LoginFormAuthenticator;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 #[Route('/users')]
 class UserController extends AbstractController
 {
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     #[Route('/', name: 'user_index', methods: ['GET'])]
     public function index(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
     {
@@ -132,5 +144,23 @@ class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/login-as/{id}', name: 'user_login_as', methods: ['GET'])]
+    public function activate(Request $request, $id, EntityManagerInterface $entityManager, Session $session)
+    {
+        $user = $entityManager->getRepository(User::class)->find($id);
+        $token = new PostAuthenticationToken(
+            $user,
+            'main',
+            $user->getRoles()
+        );
+
+        $this->tokenStorage->setToken($token);
+        $session->set('_security_main', serialize($token));
+
+        $this->addFlash('success', 'Je bent ingelogd als ' . $user->getEmail() . '.');
+
+        return $this->redirectToRoute('fe_dashboard');
     }
 }

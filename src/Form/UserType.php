@@ -22,6 +22,12 @@ class UserType extends AbstractType
                     'pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$',
                 ]
             ])
+            ->add('dansschool', null, [
+                'label' => 'Dansschool',
+                'attr' => [
+                    'placeholder' => 'Dansschool van gebruiker',
+                ]
+            ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Wachtwoord',
                 'required' => false,
