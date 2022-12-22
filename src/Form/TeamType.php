@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\DanceCategory;
+use App\Entity\Dancers;
 use App\Entity\Team;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -47,6 +48,11 @@ class TeamType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Telefoonnummer van de coach'
                 ]
+            ])
+            ->add('Trainer', ChoiceType::class, [
+                'label' => 'Dansers',
+                'required' => true,
+                'placeholder' => 'Selecteer dansers',
             ])
             ->add('TrainerBirthDay', DateType::class, [
                 'widget' => 'single_text',

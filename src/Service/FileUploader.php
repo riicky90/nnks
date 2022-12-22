@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Team;
+use App\Repository\TeamRepository;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -9,19 +11,19 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class FileUploader
 {
     private $targetDirectory;
-    private $slugger;
+    private $teamRepository;
 
-    public function __construct($targetDirectory, SluggerInterface $slugger)
+    public function __construct($targetDirectory, TeamRepository $teamRepository)
     {
         $this->targetDirectory = $targetDirectory;
-        $this->slugger = $slugger;
+        $this->teamRepository = $teamRepository;
     }
 
-    public function upload(UploadedFile $file)
+    public function upload(UploadedFile $file, $team)
     {
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+        $teamResult = $this->teamRepository->find($team);
+
+        $fileName = $teamResult->getName() . '_' . $teamResult->getUser()->getDansSchool() . '.' . $file->guessExtension();
         try {
             $file->move($this->getTargetDirectory(), $fileName);
         } catch (FileException $e) {

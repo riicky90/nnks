@@ -1,5 +1,11 @@
 {{ form_start(form) }}
+        {% if registration is defined %}
+            {% if registration.musicFile is not empty %}
+                    <p style="color:red;">
+                        Let op, je hebt al muziek geupload.
+                        Als je een nieuw muziek bestand upload, wordt de oude overschreven.
+                    </p>
+            {% endif %}
+        {% endif %}
     {{ form_widget(form) }}
-    <div class="flex justify-end">
-    </div>
 {{ form_end(form) }}

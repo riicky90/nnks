@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Contest;
 use App\Entity\Registrations;
 use App\Form\ContestType;
+use App\Form\DancersSelectForm;
 use App\Form\RegistrationsType;
 use App\Repository\ContestRepository;
 use App\Repository\DancersRepository;
@@ -16,6 +17,7 @@ use App\Service\FileUploader;
 use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Mollie\Api\Resources\Order;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,12 +45,29 @@ class FeRegistrationController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'fe_registrations_show', methods: ['GET'])]
+    public function show(Registrations $registration, OrdersRepository $orders): Response
+    {
+        return $this->render('frontend/registrations/show.html.twig', [
+            'registration' => $registration,
+            'totalDancers' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
+            'totalOrder' => $orders->createQueryBuilder('o')
+                ->select('SUM(o.Amount)')
+                ->andWhere('o.Registration = :registration')
+                ->andWhere('o.OrderStatus = :paid')
+                ->setParameter('registration', $registration)
+                ->setParameter('paid', 'paid')
+                ->getQuery()
+                ->getSingleScalarResult(),
+        ]);
+    }
+
     #[Route('/register/{contest}', name: 'fe_registration_register')]
     public function register(Request $request, $contest, ContestRepository $contestRepository, FileUploader $fileUploader, EntityManagerInterface $entityManager, OrdersRepository $ordersRepository): Response
     {
         $contest = $contestRepository->find($contest);
 
-        if($contest->getRegistrationOpenFrom() >= new \DateTime()){
+        if ($contest->getRegistrationOpenFrom() >= new \DateTime()) {
             $this->addFlash('success', 'Registratie voor dit event is nog niet mogelijk');
             return $this->redirectToRoute('fe_contests_index');
         }
@@ -71,7 +90,7 @@ class FeRegistrationController extends AbstractController
                 $musicFile = $form->get('Music')->getData();
 
                 if ($musicFile) {
-                    $musicFileName = $fileUploader->upload($musicFile);
+                    $musicFileName = $fileUploader->upload($musicFile, $registrations->getTeam());
                     $registrations->setMusicFile($musicFileName);
                 }
 
@@ -92,9 +111,9 @@ class FeRegistrationController extends AbstractController
                 $amountpaid += $order->getAmount();
             }
 
-            if($request->request->get('save')) {
+            if ($request->request->get('save')) {
                 $this->addFlash('success', 'Inschrijving opgeslagen.');
-               return $this->redirectToRoute('fe_registrations_index');
+                return $this->redirectToRoute('fe_registrations_index');
             }
 
             if ($amountpaid < $amount) {
@@ -140,7 +159,7 @@ class FeRegistrationController extends AbstractController
                 $musicFile = $form->get('Music')->getData();
 
                 if ($musicFile) {
-                    $musicFileName = $fileUploader->upload($musicFile);
+                    $musicFileName = $fileUploader->upload($musicFile, $registration->getTeam());
                     $registration->setMusicFile($musicFileName);
                 }
 
@@ -160,7 +179,7 @@ class FeRegistrationController extends AbstractController
                 $amountpaid += $order->getAmount();
             }
 
-            if($request->request->get('save')) {
+            if ($request->request->get('save')) {
                 $this->addFlash('success', 'Inschrijving opgeslagen.');
                 return $this->redirectToRoute('fe_registrations_index');
             }

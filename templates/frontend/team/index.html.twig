@@ -58,6 +58,9 @@
                                 Team naam
                             </th>
                             <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                                Aantal dansers
+                            </th>
+                            <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                                 Trainer
                             </th>
                             <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase">
@@ -76,6 +79,9 @@
 
                                 <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
                                     <div class="text-base font-semibold text-gray-900">{{ team.Name }}</div>
+                                </td>
+                                <td class="p-4 whitespace-nowrap space-x-6 mr-12 lg:mr-0">
+                                    <div class="text-base font-semibold text-gray-900">{{ team.Trainer|length }}</div>
                                 </td>
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.TrainerName }}</td>
                                 <td class="p-4 whitespace-nowrap text-base font-medium text-gray-900">{{ team.MailTrainer }}</td>

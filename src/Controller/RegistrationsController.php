@@ -61,7 +61,7 @@ class RegistrationsController extends AbstractController
             $musicFile = $form->get('Music')->getData();
 
             if ($musicFile) {
-                $fileName = $fileUploader->upload($musicFile);
+                $fileName = $fileUploader->upload($musicFile, $registration->getTeam());
                 $registration->setMusicFile($fileName);
             }
 
@@ -108,7 +108,7 @@ class RegistrationsController extends AbstractController
             $musicFile = $form->get('Music')->getData();
 
             if ($musicFile) {
-                $fileName = $fileUploader->upload($musicFile);
+                $fileName = $fileUploader->upload($musicFile, $registration->getTeam());
                 $registration->setMusicFile($fileName);
             }
 
