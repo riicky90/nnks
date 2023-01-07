@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Dancers;
 use App\Entity\Registrations;
 use App\Entity\Team;
 use App\Repository\ContestRepository;
+use App\Repository\DancersRepository;
 use App\Repository\OrganisationRepository;
 use App\Repository\RegistrationsRepository;
 use App\Repository\TeamRepository;
@@ -12,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,31 +30,34 @@ class RegistrationsType extends AbstractType
     private $token;
     private $em;
     private $security;
+    private $dancers;
 
-    public function __construct(TokenStorageInterface $token, EntityManagerInterface $em, Security $security)
+    public function __construct(TokenStorageInterface $token, EntityManagerInterface $em, Security $security, DancersRepository $dancers)
     {
         $this->token = $token;
         $this->em = $em;
         $this->security = $security;
+        $this->dancers = $dancers;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        if (!in_array('ROLE_ADMIN', $this->token->getToken()->getUser()->getRoles())) {
-            $this->getFormBuilder($builder, $options);
-            $builder->add('Dancers', DancersAutocompleteField::class, [
-                'label' => 'Dansers',
-                'required' => true,
-                'placeholder' => 'Selecteer dansers',
-            ]);
-        } else {
-            $this->getFormBuilder($builder, $options);
-            $builder->add('Dancers', DancersAutocompleteField::class, [
-                'label' => 'Dansers',
-                'required' => true,
-                'placeholder' => 'Selecteer dansers',
-            ]);
-        }
+        $this->getFormBuilder($builder, $options);
+        $builder->add('Dancers', EntityType::class, [
+            'label' => 'Dansers',
+            'class' => Dancers::class,
+            'query_builder' => function (DancersRepository $er) {
+                return $er->createQueryBuilder('d')
+                    ->leftJoin('d.Teams', 't')
+                    ->where('t.User = :user')
+                    ->setParameter('user', $this->security->getUser());
+            },
+            'multiple' => true,
+            'required' => true,
+            'placeholder' => 'Selecteer dansers',
+        ]);
+
+        $this->getFormBuilder($builder, $options);
 
         if (!$options["register"]) {
             $builder->add('Contest', null, [
@@ -85,6 +91,7 @@ class RegistrationsType extends AbstractType
                 'label' => 'Opmerkingen',
                 'required' => false,
             ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -106,7 +113,7 @@ class RegistrationsType extends AbstractType
      */
     public function getFormBuilder(FormBuilderInterface $builder, array $options): void
     {
-        if($options["edit-page"]) {
+        if ($options["edit-page"]) {
             return;
         }
         $builder->add('Team', EntityType::class, [
@@ -116,7 +123,7 @@ class RegistrationsType extends AbstractType
             'required' => true,
             'query_builder' => function (TeamRepository $teamRepository) use ($options) {
                 $qb = $teamRepository->createQueryBuilder('t');
-                if($options["contest"]) {
+                if ($options["contest"]) {
                     $expr = $this->em->getExpressionBuilder();
                     $qb->andWhere(
                         $expr->notIn(

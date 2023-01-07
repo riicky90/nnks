@@ -48,14 +48,15 @@ export default class extends Controller {
             if (!result.ok) {
                 Swal.fire({
                     title: this.titleValue + " mislukt",
-                    text: result.statusText,
+                    text: 'verwijderen niet mogelijk',
                     icon: 'error',
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
                 });
-            }
-            if(this.refreshAfterSubmitValue) {
-                window.location.reload();
+            } else {
+                if (this.refreshAfterSubmitValue) {
+                    window.location.reload();
+                }
             }
         });
 

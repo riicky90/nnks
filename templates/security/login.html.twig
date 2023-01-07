@@ -17,6 +17,12 @@
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">
                     Inloggen bij NNKS
                 </h2>
+                {% if error %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Let op!</strong>
+                        <span class="block sm:inline">Accounts van ons oude inschrijfsysteem zijn niet meer beschikbaar. Maak een nieuw account aan door <a class="underline" href="{{ path('app_register') }}">hier te klikken!.</a></span>
+                    </div>
+                {% endif %}
                 <form class="mt-8 space-y-6" method="post">
                     <div>
                         <label for="email" class="text-sm font-medium text-gray-900 block mb-2">E-mail adres</label>

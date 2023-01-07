@@ -8,7 +8,6 @@
                     <h1 class="text-xl font-bold text-gray-900 mb-2">
                         Inschrijvingen
                     </h1>
-
                     <table class="table-fixed min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                         <tr>
@@ -69,11 +68,11 @@
                                                         Muziek is nog niet geupload
                                                     </li>
                                                 {% endif %}
-                                                {% if registration.numberOfDancers < craue_setting('minimum_num_dancers') %}
+                                                {% if registration.team.dancers|length < craue_setting('minimum_num_dancers') %}
                                                     {% set count = count +1 %}
                                                     <li>
                                                         Niet genoeg dansers
-                                                        ingeschreven {{ registration.numberOfDancers }}
+                                                        ingeschreven {{ registration.team.dancers|length }}
                                                         / {{ craue_setting('minimum_num_dancers') }}
                                                     </li>
                                                 {% endif %}

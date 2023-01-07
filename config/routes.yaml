@@ -7,7 +7,7 @@ kernel:
     type: annotation
 
 live_component:
-    resource: '@LiveComponentBundle/Resources/config/routing/live_component.xml'
+    resource: '@LiveComponentBundle/config/routes.php'
 
 craue_config_settings:
     resource: "@CraueConfigBundle/Resources/config/routing/settings.xml"

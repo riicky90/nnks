@@ -30,16 +30,21 @@ class Dancers extends \App\Repository\TeamRepository
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'Trainer')]
     private $team;
 
-    #[ORM\ManyToMany(targetEntity: Registrations::class, mappedBy: 'Dancers')]
+    #[ORM\ManyToMany(targetEntity: Registrations::class, mappedBy: 'Dancers',cascade: ['detach'])]
     private $registrations;
 
     #[ORM\OneToMany(mappedBy: 'Dancer', targetEntity: EventScan::class, orphanRemoval: true)]
     private Collection $eventScans;
 
+    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'dancers')]
+    private Collection $Teams;
+
+
     public function __construct()
     {
         $this->registrations = new ArrayCollection();
         $this->eventScans = new ArrayCollection();
+        $this->Teams = new ArrayCollection();
     }
     public function __toString() {
         return $this->FirstName. ' '. $this->SecondName. ' '. $this->LastName;
@@ -106,7 +111,6 @@ class Dancers extends \App\Repository\TeamRepository
     public function setTeam(?Team $team): self
     {
         $this->team = $team;
-
         return $this;
     }
 
@@ -176,4 +180,29 @@ class Dancers extends \App\Repository\TeamRepository
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->Teams;
+    }
+
+    public function addTeam(Team $team): self
+    {
+        if (!$this->Teams->contains($team)) {
+            $this->Teams->add($team);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): self
+    {
+        $this->Teams->removeElement($team);
+
+        return $this;
+    }
+
 }

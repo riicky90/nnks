@@ -78,11 +78,11 @@ class RegistrationsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'registrations_show', methods: ['GET'])]
-    public function show(Registrations $registration, $id, OrdersRepository $orders, Config $config): Response
+    public function show(Registrations $registration, $id, OrdersRepository $orders): Response
     {
         return $this->render('registrations/show.html.twig', [
             'registration' => $registration,
-            'totalDancers' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
+            'totalDancers' => $registration->getTeam()->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
             'totalOrder' => $orders->createQueryBuilder('o')
                 ->select('SUM(o.Amount)')
                 ->andWhere('o.Registration = :registration')

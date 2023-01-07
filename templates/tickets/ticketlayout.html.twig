@@ -8,6 +8,14 @@
             -moz-box-sizing: border-box;
         }
 
+        .page {
+            page-break-after: always;
+        }
+
+        .page:last-of-type {
+            page-break-after: auto
+        }
+
         body {
             font-family: Helvetica;
             -webkit-font-smoothing: antialiased;
@@ -39,6 +47,11 @@
             text-align: left;
         }
 
+        .item-ticket {
+            padding-bottom: 400px;
+            padding-top: 400px;
+        }
+
         .fl-table td {
             font-size: 18px;
         }
@@ -51,38 +64,31 @@
 </head>
 
 {% block body %}
-    <h1>NNKS Tickets team: {{ registration.Team.Name }}</h1>
-    {% set value = registration.Team.User %}
-    <h3>Dansschool: {{ value.Dansschool }}</h3>
+    <div class="page">
+        <h1>NNKS Tickets team: {{ registration.Team.Name }}</h1>
+        {% set value = registration.Team.User %}
+        <h3>Dansschool: {{ value.Dansschool }}</h3>
 
-    <ul style="list-style: none; padding-left: 0;">
-        <h4 style="margin-bottom: 0px;">{{ registration.Contest.Name }}</h4>
-        <li>Datum: {{ registration.Contest.Date|date('d-m-Y') }}</li>
-        <li>Locatie: {{ registration.Contest.Location }}</li>
-        <li></li>
-    </ul>
+        <ul style="list-style: none; padding-left: 0;">
+            <h4 style="margin-bottom: 0px;">{{ registration.Contest.Name }}</h4>
+            <li>Datum: {{ registration.Contest.Date|date('d-m-Y') }}</li>
+            <li>Locatie: {{ registration.Contest.Location }}</li>
+            <li></li>
+        </ul>
 
-    <h3>Trainer: {{ registration.Team.TrainerName }}</h3>
+        <h3>Trainer: {{ registration.Team.TrainerName }}</h3>
+    </div>
+
     <div class="table-wrapper">
-        <table class="fl-table" style="border:none;">
-            <thead>
-            <tr>
-                <th>Naam + Achternaam</th>
-                <th>Geboortedatum</th>
-                <th>Ticket QR</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for dancer in dancers %}
-                <tr style="padding-top: 600px; padding-bottom: 600px">
-                    <td>{{ dancer.Firstname }} {{ dancer.SecondName }} {{ dancer.LastName }} </td>
-                    <td>{{ dancer.BirthDay|date('d-m-Y') }}</td>
-                    <td><img width="200" src="{{ qr_code_data_uri(url('eventscan_scan', {contest: registration.contest.id, dancer: dancer.id})) }}"/>
-                    </td>
-                </tr>
+        {% for dancer in dancers %}
+            <div style="text-align: center" class="page">
+                <div style="font-size: 40px;">Ticket van: {{ dancer.Firstname }} {{ dancer.SecondName }} {{ dancer.LastName }} </div>
+                <div style="margin-top: 20px;"><img width="500"
+                          src="{{ qr_code_data_uri(url('eventscan_scan', {contest: registration.contest.id, dancer: dancer.id})) }}"/>
+                </div>
+                <div style="font-size: 40px;">Geboorte datum: {{ dancer.BirthDay|date('d-m-Y') }}</div>
 
-            {% endfor %}
-            <tbody>
-        </table>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}

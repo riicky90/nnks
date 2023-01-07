@@ -56,10 +56,14 @@ class Team
     #[ORM\Column(length: 255)]
     private ?string $TrainerLastname = null;
 
+    #[ORM\ManyToMany(targetEntity: Dancers::class, mappedBy: 'Teams')]
+    private Collection $dancers;
+
     public function __construct()
     {
         $this->Trainer = new ArrayCollection();
         $this->registrations = new ArrayCollection();
+        $this->dancers = new ArrayCollection();
     }
 
     public function __toString() {
@@ -235,6 +239,33 @@ class Team
     public function setTrainerLastname(string $TrainerLastname): self
     {
         $this->TrainerLastname = $TrainerLastname;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dancers>
+     */
+    public function getDancers(): Collection
+    {
+        return $this->dancers;
+    }
+
+    public function addDancer(Dancers $dancer): self
+    {
+        if (!$this->dancers->contains($dancer)) {
+            $this->dancers->add($dancer);
+            $dancer->addTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDancer(Dancers $dancer): self
+    {
+        if ($this->dancers->removeElement($dancer)) {
+            $dancer->removeTeam($this);
+        }
 
         return $this;
     }

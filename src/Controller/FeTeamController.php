@@ -100,4 +100,14 @@ class FeTeamController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    //add show function
+    #[Route('/{id}/show', name: 'fe_team_show', methods: ['GET', 'POST'])]
+    public function show(Team $team, $id, EntityManagerInterface $entityManager, TeamRepository $teamRepository): Response
+    {
+
+        return $this->render('frontend/team/show.html.twig', [
+            'team' => $team,
+        ]);
+    }
 }

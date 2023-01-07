@@ -27,7 +27,7 @@ class Registrations
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'registrations')]
     private $Team;
 
-    #[ORM\ManyToMany(targetEntity: Dancers::class, inversedBy: 'registrations', fetch: 'EAGER')]
+    #[ORM\ManyToMany(targetEntity: Dancers::class, inversedBy: 'registrations', cascade: ['all'], fetch: 'EAGER')]
     private $Dancers;
 
     #[Gedmo\Versioned]
@@ -39,7 +39,7 @@ class Registrations
     #[ORM\JoinColumn(nullable: false)]
     private $Contest;
 
-    #[ORM\OneToMany(mappedBy: 'Registration', targetEntity: Orders::class, cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'Registration', targetEntity: Orders::class, cascade: ['detach'], orphanRemoval: true)]
     private $orders;
 
     #[Gedmo\Versioned]
@@ -172,7 +172,7 @@ class Registrations
 
     public function getNumberOfDancers(): int
     {
-        return count($this->Dancers);
+        return count($this->Team->getDancers());
     }
 
     public function getTotalpaid()

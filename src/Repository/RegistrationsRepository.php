@@ -46,7 +46,7 @@ class RegistrationsRepository extends ServiceEntityRepository
     public function activeRegistrations($organisation)
     {
         return $this->createQueryBuilder('r',)
-            ->leftJoin('r.Team', 't')
+            ->leftJoin('r.Teams', 't')
             ->andWhere('t.Organisation = :org')
             ->setParameter('org', $organisation)
             ->getQuery()
@@ -118,6 +118,8 @@ class RegistrationsRepository extends ServiceEntityRepository
         $qb->where('t.Name LIKE :search OR c.Name LIKE :search OR r.id LIKE :search')
             ->setParameter('search', '%' . $search . '%');
         $qb->setParameter('search', '%'.$search.'%');
+
+        $qb->orderBy('r.createdAt', 'DESC');
 
         return $qb->getQuery();
     }

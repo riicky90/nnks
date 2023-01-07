@@ -18,7 +18,7 @@ class TicketsController extends AbstractController
     public function index($registration, RegistrationsRepository $registrationsRepository, Pdf $pdf)
     {
         $registrations = $registrationsRepository->find($registration);
-        $dancers = $registrations->getDancers();
+        $dancers = $registrations->getTeam()->getDancers();
 
         //check if amount paid is equal or higher than the registration fee
         $totalAmountPaid = 0;
@@ -27,7 +27,7 @@ class TicketsController extends AbstractController
                 $totalAmountPaid += $order->getAmount();
             }
         }
-        $grandTotal = $registrations->getContest()->getRegistrationFee() * $registrations->getDancers()->count();
+        $grandTotal = $registrations->getContest()->getRegistrationFee() * $dancers->count();
 
         if (!$totalAmountPaid >= $grandTotal) {
             return new Response('Registratie nog niet betaald');
@@ -56,8 +56,14 @@ class TicketsController extends AbstractController
     {
         $registrations = $registrationsRepository->find($registration);
 
-        $dancers = $registrations->getDancers();
-
+        //prepare pdf for email
+        $dancers = $registrations->getTeam()->getDancers();
+        $html = $this->render('tickets/ticketlayout.html.twig', [
+            'registration' => $registrations,
+            'dancers' => $dancers
+        ])->getContent();
+        $filename = 'ticket_' . $registrations->getId() . '.pdf';
+        $pdf = $pdf->getOutputFromHtml($html);
 
         $email = (new Email())
             ->from('info@nnks.nl')

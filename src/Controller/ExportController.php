@@ -63,9 +63,9 @@ class ExportController extends AbstractController
                 $sheet->setCellValue('F' . $count, $item->getTeam()->getTrainerName());
                 $sheet->setCellValue('G' . $count, $item->getTeam()->getMailTrainer());
                 $sheet->setCellValue('H' . $count, $item->getTeam()->getUser()->getDansSchool());
-                $sheet->setCellValue('I' . $count, count($item->getDancers()));
+                $sheet->setCellValue('I' . $count, count($item->getTeam()->getDancers()));
                 $dancers = '';
-                foreach ($item->getDancers() as $dancer) {
+                foreach ($item->getTeam()->getDancers() as $dancer) {
                     $dancers .= $dancer->getFirstName() . ' ' . $dancer->getLastName() . ' ' . $dancer->getBirthDay()->format('d-m-Y') . ', ';
                 }
                 $sheet->setCellValue('J' . $count, $dancers);

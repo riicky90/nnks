@@ -27,17 +27,17 @@ class DancersType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('Team', EntityType::class, [
+            ->add('Teams', EntityType::class, [
                 'class' => Team::class,
                 'query_builder' => function (TeamRepository $er) {
                     return $er->createQueryBuilder('t')
                         ->where('t.User = :user')
                         ->setParameter('user', $this->user->getUser());
                 },
-                'choice_label' => 'Name',
-                'choice_value' => 'Id',
-                'label' => 'Team',
+                'label' => 'Teams',
                 'required' => true,
+                'multiple' => true,
+                'autocomplete' => true,
             ])
             ->add('FirstName', TextType::class, [
                 'label' => 'Voornaam',
@@ -67,6 +67,7 @@ class DancersType extends AbstractType
                     'placeholder' => 'Geboortedatum van de danser'
                 ],
             ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

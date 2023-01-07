@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\DependandTestType;
 use App\Form\RegistrationFormType;
+use App\Repository\DanceCategoryRepository;
+use App\Repository\DancersRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Security\LoginFormAuthenticator;
@@ -31,7 +34,7 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
-        if($this->getUser()) {
+        if ($this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
 
@@ -70,6 +73,55 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
+
+    //create test route and render depandend test form type
+    #[Route('/test', name: 'app_test')]
+    public function test(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
+    {
+        //render a form
+        $form = $this->createForm(DependandTestType::class);
+        $form->handleRequest($request);
+
+        //if form is submitted and valid
+        if ($form->isSubmitted() && $form->isValid()) {
+            //get data from form
+            $data = $form->getData();
+            //do something with data
+            //...
+            //redirect to homepage
+        }
+
+        //render form
+        return $this->render('test/test.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    //create a route that returns the dancers related to a team
+    #[Route('/get-dancers/json/{teamId}', name: 'app_get_dancers')]
+    public function getDancers($teamId, DancersRepository $dancersRepository): Response
+    {
+        //get dancers from database
+        $dancers = $dancersRepository->findBy(['team' => $teamId]);
+        //create array to store dancer names
+        $dancerNames = [];
+        //loop through dancers
+        foreach ($dancers as $dancer) {
+            //add dancer name to array
+            $dancerNames[] = [
+                "value" => $dancer->getId(),
+                    "text" => $dancer->getFullName()
+            ];
+        }
+
+        $dancerNames = [
+            "result" => $dancerNames
+        ];
+
+        //return dancer names as json
+        return $this->json($dancerNames);
+    }
+
 
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator, UserRepository $userRepository): Response

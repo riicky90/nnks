@@ -36,7 +36,7 @@ class PaymentController extends AbstractController
             $paidAmount += $paidOrder->getAmount();
         }
 
-        $dancers = $registration->getDancers()->count();
+        $dancers = $registration->getTeam()->getDancers()->count();
         $amount = $dancers * $registration->getContest()->getRegistrationFee() - $paidAmount;
         $amount = number_format($amount, 2, '.', '');
 
@@ -113,7 +113,7 @@ class PaymentController extends AbstractController
             $paidAmount += $paidOrder->getAmount();
         }
 
-        $dancers = $registration->getDancers()->count();
+        $dancers = $registration->getTeam()->getDancers()->count();
         $amount = $dancers * $registration->getContest()->getRegistrationFee() - $paidAmount;
         $amount = number_format($amount, 2, '.', '');
 

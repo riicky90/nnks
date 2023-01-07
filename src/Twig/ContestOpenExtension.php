@@ -53,7 +53,7 @@ class ContestOpenExtension extends AbstractExtension
     public function registrationpaid(int $registration): bool
     {
         $registration = $this->registrationRepository->find($registration);
-        $dancers = count($registration->getDancers());
+        $dancers = count($registration->getTeam()->getDancers());
         $totalDue = $dancers * $registration->getContest()->getRegistrationFee();
 
         //sum total orders that are paid for this contest

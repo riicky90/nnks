@@ -49,11 +49,6 @@ class TeamType extends AbstractType
                     'placeholder' => 'Telefoonnummer van de coach'
                 ]
             ])
-            ->add('Trainer', ChoiceType::class, [
-                'label' => 'Dansers',
-                'required' => true,
-                'placeholder' => 'Selecteer dansers',
-            ])
             ->add('TrainerBirthDay', DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Geboortedatum coach',

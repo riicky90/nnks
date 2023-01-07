@@ -33,7 +33,7 @@ class UserListener
 
             $email = (new Email())
                 ->from('info@nnks.nl')
-                ->to($entity->getRegistration()->getTeam()->getMailTrainer())
+                ->to($entity->getRegistration()->getTeam()->getUser()->getEmail())
                 //->cc('cc@example.com')
                 //->bcc('bcc@example.com')
                 //->replyTo('fabien@example.com')

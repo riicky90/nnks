@@ -45,7 +45,7 @@ class FeDancerController extends AbstractController
     }
 
     #[Route('/new', name: 'fe_dancer_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, RegistrationsRepository $registrationsRepository): Response
     {
         $dancer = new Dancers();
         $form = $this->createForm(DancersType::class, $dancer, [
@@ -55,7 +55,6 @@ class FeDancerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
 
             $entityManager->persist($dancer);
             $entityManager->flush();
@@ -76,14 +75,14 @@ class FeDancerController extends AbstractController
             $entityManager->remove($dancers);
             $entityManager->flush();
         }
-        //message succvol verwijderd
+
         $this->addFlash('success', 'Danser verwijderd');
 
         return $this->redirectToRoute('fe_dancers_index', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}/edit', name: 'fe_dancer_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Dancers $dancers, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Dancers $dancers, RegistrationsRepository $registrationsRepository, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(DancersType::class, $dancers, [
             'action' => $this->generateUrl('fe_dancer_edit', ['id' => $dancers->getId()]),
@@ -92,6 +91,7 @@ class FeDancerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Danser opgeslagen');

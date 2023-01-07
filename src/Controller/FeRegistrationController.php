@@ -2,23 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Contest;
 use App\Entity\Registrations;
-use App\Form\ContestType;
-use App\Form\DancersSelectForm;
+use App\Entity\Team;
 use App\Form\RegistrationsType;
 use App\Repository\ContestRepository;
-use App\Repository\DancersRepository;
 use App\Repository\OrdersRepository;
 use App\Repository\RegistrationsRepository;
 use App\Repository\TeamRepository;
-use App\Repository\UserRepository;
 use App\Service\FileUploader;
-use Craue\ConfigBundle\Util\Config;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Mollie\Api\Resources\Order;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -50,7 +45,7 @@ class FeRegistrationController extends AbstractController
     {
         return $this->render('frontend/registrations/show.html.twig', [
             'registration' => $registration,
-            'totalDancers' => $registration->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
+            'totalDancers' => $registration->getTeam()->getDancers()->count() * $registration->getContest()->getRegistrationFee(),
             'totalOrder' => $orders->createQueryBuilder('o')
                 ->select('SUM(o.Amount)')
                 ->andWhere('o.Registration = :registration')
@@ -209,5 +204,37 @@ class FeRegistrationController extends AbstractController
             'totalpaid' => $amountpaid,
             'form' => $form->createView(),
         ]);
+    }
+
+    //return number of dancer inside given team with route
+    #[Route('/getdancers/{team}', name: 'fe_get_dancers')]
+    public function getDancers(Team $team, TeamRepository $teamsRepository): Response
+    {
+        $team = $teamsRepository->find($team);
+        $dancers = $team->getDancers();
+        $count = count($dancers);
+
+
+        //prepare dancers array with all details
+        $dancersArray = [];
+        foreach ($dancers as $dancer) {
+            $dancersArray[] = [
+                'id' => $dancer->getId(),
+                'FirstName' => $dancer->getFirstName(),
+                'SecondName' => $dancer->getSecondName(),
+                'LastName' => $dancer->getLastName(),
+                'AllDetails' => $dancer->getAllDetails(),
+            ];
+        }
+
+
+        //combine count with dancers inside team return as json
+        $response = new JsonResponse();
+        $response->setData([
+            'count' => $count,
+            'dancers' => $dancersArray,
+        ]);
+
+        return $response;
     }
 }

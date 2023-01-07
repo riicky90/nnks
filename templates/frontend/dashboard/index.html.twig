@@ -1,6 +1,8 @@
 {% extends 'frontend/theme/base.html.twig' %}
 {% block body %}
+
     <div class="pt-6 px-4">
+
         <div class="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-1 gap-4">
             <h1 class="text-xl font-bold text-gray-900 mb-2">NNKS inschrijf software</h1>
             <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
@@ -29,7 +31,8 @@
                                 <h3 class="text-base font-normal text-gray-500">Aantal teams</h3>
                             </div>
                         </div>
-                    </div></a>
+                    </div>
+                </a>
                 <a href="{{ path('fe_contests_index') }}">
                     <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 hover:shadow-lg cursor-pointer">
                         <div class="flex items-center">
@@ -38,7 +41,8 @@
                                 <h3 class="text-base font-normal text-gray-500">Aantal wedstrijden</h3>
                             </div>
                         </div>
-                    </div></a>
+                    </div>
+                </a>
                 <a href="{{ path('fe_registrations_index') }}">
                     <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 hover:shadow-lg cursor-pointer">
                         <div class="flex items-center">
@@ -47,7 +51,8 @@
                                 <h3 class="text-base font-normal text-gray-500">Aantal inschrijvingen</h3>
                             </div>
                         </div>
-                    </div></a>
+                    </div>
+                </a>
             </div>
             <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
                 <div class="mb-4 flex items-center justify-between">
@@ -62,16 +67,20 @@
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col"
+                                            class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Ordernummer
                                         </th>
-                                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col"
+                                            class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Datum/tijd
                                         </th>
-                                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col"
+                                            class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col"
+                                            class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Bedrag
                                         </th>
                                     </tr>
@@ -86,7 +95,7 @@
                                                 {{ order.createdAt|date('d-m-Y H:i:s') }}
                                             </td>
                                             <td class="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                                <span class="p-1 text-sm rounded {% if order.orderStatus == 'paid'%} bg-green-200 {% else %} bg-red-200 {% endif%}"> {{ order.orderStatus }}</span>
+                                                <span class="p-1 text-sm rounded {% if order.orderStatus == 'paid' %} bg-green-200 {% else %} bg-red-200 {% endif %}"> {{ order.orderStatus }}</span>
                                             </td>
                                             <td class="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                                 € {{ order.amount }}
@@ -101,5 +110,6 @@
                 </div>
             </div>
         </div>
+        {% include 'theme/_modal.html.twig' %}
     </div>
 {% endblock %}

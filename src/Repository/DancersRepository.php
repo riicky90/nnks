@@ -24,7 +24,7 @@ class DancersRepository extends ServiceEntityRepository
     public function findByUser($user, $search): int|array|string
     {
         $qb = $this->createQueryBuilder('d')
-            ->leftJoin('d.team', 't')
+            ->leftJoin('d.Teams', 't')
             ->andWhere('t.User = :user')
             ->andWhere('d.FirstName LIKE :search OR d.LastName LIKE :search')
             ->setParameter('search', '%' . $search . '%')
